@@ -1,4 +1,21 @@
-from extensions import SQLAlchemy, db, datetime, timezone
+from extensions import SQLAlchemy, db, datetime, psycopg2, os, Flask
+from dotenv import load_dotenv
+import os
+from sqlalchemy import create_engine, text
+
+load_dotenv()
+
+engine = create_engine(
+    f"postgresql+psycopg2://{os.environ['DB_USER']}:{os.environ['DB_PASS']}"
+    f"@{os.environ['DB_HOST']}:{os.environ.get('DB_PORT', 5432)}/{os.environ['DB_NAME']}"
+)
+
+try:
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+        print("Database connected successfully!")
+except Exception as e:
+    print(f"Connection failed: {e}")
 
 class timestampMixin:
     """Adds created_at and updated_at to any model."""
@@ -18,10 +35,10 @@ class timestampMixin:
 class User(db.Model):
     __tablename__ = 'User'
 
-    userId     = db.Column("userId", db.String(50), primary_key=True, unique = True, nullable = False, required = True)
-    name       = db.Column("name", db.String(100), nullable = False, required = True)
-    email      = db.Column("email", db.String(100), nullable = False, required = True)
-    password   = db.Column("password", db.String(255), nullable = False, required = True)
+    userId     = db.Column("userId", db.String(50), primary_key=True, unique = True, nullable = False)
+    name       = db.Column("name", db.String(100), nullable = False)
+    email      = db.Column("email", db.String(100), nullable = False)
+    password   = db.Column("password", db.String(255), nullable = False)
     
     def __init__(self, userId, name, email, password):
         self.userId = userId
