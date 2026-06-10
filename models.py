@@ -1,4 +1,4 @@
-from extensions import SQLAlchemy, db, datetime, timezone
+from extensions import SQLAlchemy, db, datetime
 
 class timestampMixin:
     """Adds created_at and updated_at to any model."""
