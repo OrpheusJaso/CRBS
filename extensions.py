@@ -14,7 +14,6 @@ import time
 from flask_wtf.csrf import CSRFProtect
 import random
 import threading
-from pytz import timezone
 import re
 
 db =  SQLAlchemy()
