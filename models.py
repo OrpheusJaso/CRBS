@@ -45,3 +45,25 @@ class User(db.Model):
         self.name = name
         self.email = email
         self.password = password
+        
+class Resource(db.Model):
+    
+    __tablename__ = "resource"
+    
+    resourceId = db.Column("resourceId",  db.Integer, db.Sequence('resourceId_seq', start=400), primary_key = True, nullable = False)
+    name = db.Column("name", db.String(100), nullable = False)
+    type = db.Column("type", db.String(50), nullable = False)
+    capacity = db.Column("capacity", db.Integer, nullable = False)
+    location = db.Column("location", db.String(255), nullable = False)
+    status = db.Column("status", db.String(100), nullable = False)
+    description = db.Column("description", db.String(255), nullable = True)
+    isSpecialised = db.Column("isSpecialised", db.Boolean, nullable = False)
+    
+    def __init__(self, name, type, capacity, location, status, isSpecialised, description=None):
+        self.name = name
+        self.type = type
+        self.capacity = capacity
+        self.location = location
+        self.status = status
+        self.isSpecialised = isSpecialised
+        self.description = description

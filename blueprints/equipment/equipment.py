@@ -66,13 +66,13 @@ class equipment(db.Model):
         self.__isSpecialised = isSpecialised
 
 
-@equipmentBp.post("/register")
+@equipmentBp.route("/register")
 def Equipment():
     
     # placeholder implementation (simple JSON-compatible return)
     return {"model": "User"}
 
-@equipmentBp.post("/login")
+@equipmentBp.route("/login")
 def login():
     
     # placeholder implementation (simple JSON-compatible return)

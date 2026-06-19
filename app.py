@@ -2,7 +2,7 @@ from extensions import *
 import models
 
 load_dotenv('.venv')
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 app.permanent_session_lifetime = timedelta(days=30)
 csrf = CSRFProtect(app) 
 
@@ -45,10 +45,10 @@ def _register_error_handlers(app: Flask) -> None:
 
 @app.route('/')
 def hello_world():
-    return 'Hello World'
+    return render_template('index.html')
     
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port = 5555, debug=True)
     
