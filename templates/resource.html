@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Resources</title>
+</head>
+<body>
+    <h1></h1>
+    
+
+    
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+      {% endif %}
+    {% endwith %}
+
+    <a href="{{ url_for('resource.create') }}">Create New Resource</a>
+    
+    <table border="1" style="margin-top: 10px; width: 50%; text-align: left;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for res in resources %}
+            <tr>
+                <td>{{ res.id }}</td>
+                <td>{{ res.name }}</td>
+                <td>{{ res.type }}</td>
+                <td>
+                    <a href="{{ url_for('resource.edit', resource_id=res.id) }}">Edit</a>
+                    
+                    <form action="{{ url_for('resource.delete', resource_id=res.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Are you sure?');">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
