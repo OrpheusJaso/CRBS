@@ -1,0 +1,27 @@
+/* Campus Resource Booking — custom styles (everything Tailwind doesn't cover). */
+
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+/* Active sidebar item */
+.nav-btn.active {
+  background: #e0f2fe;
+  color: #075985;
+  border-color: #7dd3fc;
+}
+
+/* Modal show/hide */
+.modal {
+  display: none;
+}
+
+.modal.active {
+  display: flex;
+}
+
+/* Dashboard calendar cell */
+.calendar-cell {
+  min-height: 104px;
+}

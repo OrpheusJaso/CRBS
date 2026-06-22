@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Manage Bookings{% endblock %}
+{% block active_page %}bookings{% endblock %}
+
+{% block content %}
+<section id="bookings">
+  <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h2 class="text-2xl font-semibold">Manage Bookings</h2>
+      <p class="text-sm text-slate-600">Modify, cancel, check in, or review booking status and no-show outcomes.</p>
+    </div>
+    <a href="{{ url_for('views.search') }}" class="flex items-center justify-center gap-2 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white">
+      <i data-lucide="plus" class="h-4 w-4"></i> Create Booking
+    </a>
+  </div>
+
+  <div class="overflow-hidden rounded-md border border-slate-200 bg-white">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[880px] text-left text-sm">
+        <thead class="border-b border-slate-200 bg-slate-50 text-slate-600">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Resource</th>
+            <th class="px-4 py-3 font-semibold">Date &amp; Time</th>
+            <th class="px-4 py-3 font-semibold">Purpose</th>
+            <th class="px-4 py-3 font-semibold">Status</th>
+            <th class="px-4 py-3 font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingRows" class="divide-y divide-slate-200">
+          <tr><td colspan="5" class="px-4 py-6 text-sm text-slate-500">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_script %}
+<script src="{{ url_for('static', filename='js/bookings.js') }}"></script>
+{% endblock %}

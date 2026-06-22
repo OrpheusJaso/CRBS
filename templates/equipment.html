@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Specialized Equipment{% endblock %}
+{% block active_page %}equipment{% endblock %}
+
+{% block content %}
+<section id="equipment">
+  <div class="mb-5">
+    <h2 class="text-2xl font-semibold">Specialized Equipment Request</h2>
+    <p class="text-sm text-slate-600">Submit requests that require resource manager or admin approval before confirmation.</p>
+  </div>
+
+  <div class="grid gap-5 xl:grid-cols-[0.85fr_1.15fr]">
+    <form id="equipmentForm" class="rounded-md border border-slate-200 bg-white p-4">
+      <div class="grid gap-4">
+        <label class="block text-sm font-medium">Equipment
+          <select id="eq_name" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option>Loading…</option>
+          </select>
+        </label>
+        <label class="block text-sm font-medium">Purpose
+          <textarea id="eq_purpose" class="mt-2 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">Guest lecture with external speaker</textarea>
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block text-sm font-medium">Date
+            <input type="date" id="eq_date" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+          <label class="block text-sm font-medium">Attendees
+            <input type="number" id="eq_attendees" value="80" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+        </div>
+        <div class="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
+          <div class="flex gap-2">
+            <i data-lucide="shield-alert" class="mt-0.5 h-4 w-4"></i>
+            <p>This request will remain pending until a resource manager approves it.</p>
+          </div>
+        </div>
+        <button type="submit" class="flex items-center justify-center gap-2 rounded-md bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white">
+          <i data-lucide="send" class="h-4 w-4"></i> Submit Request
+        </button>
+      </div>
+    </form>
+
+    <div class="rounded-md border border-slate-200 bg-white p-4">
+      <h3 class="mb-3 font-semibold">Approval Workflow</h3>
+      <div class="space-y-3 text-sm">
+        <div class="flex gap-3 rounded-md bg-slate-50 p-3">
+          <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-700 text-xs font-semibold text-white">1</span>
+          <div><p class="font-medium">Staff submits request</p><p class="text-slate-600">Purpose, resource, date, time, and attendees are recorded.</p></div>
+        </div>
+        <div class="flex gap-3 rounded-md bg-slate-50 p-3">
+          <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-700 text-xs font-semibold text-white">2</span>
+          <div><p class="font-medium">Resource manager reviews</p><p class="text-slate-600">Availability, maintenance status, and suitability are checked.</p></div>
+        </div>
+        <div class="flex gap-3 rounded-md bg-slate-50 p-3">
+          <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-700 text-xs font-semibold text-white">3</span>
+          <div><p class="font-medium">Notification sent</p><p class="text-slate-600">Staff receives approval, rejection, or modification request.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_script %}
+<script src="{{ url_for('static', filename='js/equipment.js') }}"></script>
+{% endblock %}
