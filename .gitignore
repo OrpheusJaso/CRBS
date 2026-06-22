@@ -2,6 +2,9 @@
 .env
 *.db
 
+# UI prototype reference (reformatted into templates/)
+campus-resource-booking-ui-prototype.html
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

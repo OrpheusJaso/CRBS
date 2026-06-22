@@ -12,8 +12,8 @@ def create_app(config_class=Config):
     _register_blueprints(app)
     _register_error_handlers(app)
 
-    @app.route("/")
-    def hello_world():
+    @app.route("/api")
+    def api_index():
         return jsonify(
             service="Campus Resource Booking System",
             status="ok",
@@ -22,6 +22,9 @@ def create_app(config_class=Config):
                 "/api/resource/search",
                 "/api/booking",
                 "/api/notification",
+                "/api/dashboard",
+                "/api/equipment/request",
+                "/api/report/export",
             ],
         )
 

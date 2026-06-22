@@ -169,3 +169,33 @@ class Equipment(db.Model):
             "isSpecialised": self.isSpecialised,
             "condition": self.condition,
         }
+
+
+class EquipmentRequest(db.Model):
+    """A staff request to use specialised equipment (Equipment Request form)."""
+    __tablename__ = "equipment_request"
+
+    requestId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    userId = db.Column(db.String(50), db.ForeignKey("user.userId"), nullable=False)
+    equipmentName = db.Column(db.String(100), nullable=False)
+    purpose = db.Column(db.String(500), nullable=True)
+    requestedDate = db.Column(db.DateTime, nullable=True)
+    attendees = db.Column(db.Integer, nullable=True)
+    # pending | approved | rejected
+    status = db.Column(db.String(20), nullable=False, default="pending")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship("User", backref="equipment_requests", lazy=True)
+
+    def to_dict(self):
+        return {
+            "requestId": self.requestId,
+            "userId": self.userId,
+            "requesterName": self.user.name if self.user else None,
+            "equipmentName": self.equipmentName,
+            "purpose": self.purpose,
+            "requestedDate": self.requestedDate.isoformat() if self.requestedDate else None,
+            "attendees": self.attendees,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }

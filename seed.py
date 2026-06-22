@@ -4,7 +4,9 @@ Runs only when the tables are empty, so it is safe to call on every startup.
 """
 from datetime import datetime, timedelta
 from extensions import db
-from models import User, Resource, Booking, Notification
+from models import (
+    User, Resource, Booking, Notification, Equipment, EquipmentRequest,
+)
 
 
 def seed_demo_data():
@@ -68,5 +70,20 @@ def seed_demo_data():
                      message="Projector P-04 is unavailable Friday 13:00-17:00.",
                      type="maintenance"),
     ])
+
+    db.session.add_all([
+        Equipment(name="High-lumen projector P-04", type="projector",
+                  quantity=2, isSpecialised=True, condition="good"),
+        Equipment(name="Wireless microphone set", type="audio",
+                  quantity=5, isSpecialised=True, condition="good"),
+        Equipment(name="Video conference kit", type="av",
+                  quantity=3, isSpecialised=True, condition="good"),
+    ])
+
+    db.session.add(EquipmentRequest(
+        userId=staff, equipmentName="High-lumen projector P-04",
+        purpose="Guest lecture with external speaker",
+        requestedDate=now + timedelta(days=5), attendees=80, status="pending",
+    ))
 
     db.session.commit()
