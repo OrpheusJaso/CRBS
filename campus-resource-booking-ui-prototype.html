@@ -1,0 +1,345 @@
+﻿<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>MMU Campus Resource Booking - Staff Prototype</title> <script src="https://cdn.tailwindcss.com"></script> <script src="https://unpkg.com/lucide@latest"></script> <style> body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; } .screen { display: none; } .screen.active { display: block; } .nav-btn.active { background: #e0f2fe; color: #075985; border-color: #7dd3fc; } .modal { display: none; } .modal.active { display: flex; } .calendar-cell { min-height: 104px; } </style> </head> <body class="bg-slate-100 text-slate-900"> <div id="toast" class="fixed right-4 top-4 z-50 hidden rounded-md border border-emerald-200 bg-white px-4 py-3 text-sm shadow-lg"> <div class="flex items-start gap-3"> <i data-lucide="check-circle-2" class="mt-0.5 h-5 w-5 text-emerald-600"></i> <div> <p id="toastTitle" class="font-semibold text-slate-900">Action completed</p> <p id="toastMessage" class="text-slate-600">Your changes were saved.</p> </div> </div> </div> <section id="loginScreen" class="min-h-screen bg-slate-100"> <div class="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]"> <div class="flex items-center justify-center px-6 py-12"> <div class="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 shadow-sm"> <div class="mb-8 flex items-center gap-3"> <div class="flex h-11 w-11 items-center justify-center rounded-md bg-sky-700 text-white"> <i data-lucide="building-2" class="h-6 w-6"></i> </div> <div> <p class="text-sm font-medium text-slate-500">MMU Campus</p> <h1 class="text-xl font-semibold">Resource Booking</h1> </div> </div> <div class="mb-6 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"> <div class="flex gap-2"> <i data-lucide="info" class="mt-0.5 h-4 w-4"></i> <p>Staff and faculty access only. Use your campus account to continue.</p> </div> </div> <form onsubmit="event.preventDefault(); enterApp();"> <label class="mb-2 block text-sm font-medium" for="email">Email address</label> <input id="email" type="email" value="lecturer@mmu.edu.my" class="mb-4 w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100" /> <label class="mb-2 block text-sm font-medium" for="loginRole">Demo access role</label> <select id="loginRole" class="mb-4 w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100"> <option value="staff">Staff / Faculty</option> <option value="student">Student</option> <option value="manager">Resource Manager</option> <option value="admin">Admin</option> </select> <label class="mb-2 block text-sm font-medium" for="password">Password</label> <div class="mb-5 flex rounded-md border border-slate-300 bg-white focus-within:border-sky-600 focus-within:ring-2 focus-within:ring-sky-100"> <input id="password" type="password" value="password123" class="w-full rounded-md px-3 py-2.5 text-sm outline-none" /> <button type="button" class="px-3 text-slate-500" title="Show password"><i data-lucide="eye" class="h-4 w-4"></i></button> </div> <div class="mb-5 flex justify-end"> <button type="button" onclick="openModal('forgotPasswordModal')" class="text-sm font-semibold text-sky-700 hover:text-sky-900">Forgot password?</button> </div> <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-800"> <i data-lucide="log-in" class="h-4 w-4"></i> Sign in </button> </form> </div> </div> <div class="hidden bg-sky-950 px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between"> <div> <p class="mb-4 text-sm font-semibold uppercase tracking-wide text-sky-200">Staff/Faculty Portal</p> <h2 class="max-w-xl text-4xl font-semibold leading-tight">Book rooms, labs, and equipment with clear approval and check-in flows.</h2> </div> <div class="grid gap-3 text-sm text-sky-100"> <div class="flex items-center gap-3"><i data-lucide="calendar-check" class="h-5 w-5"></i> Single and recurring bookings</div> <div class="flex items-center gap-3"><i data-lucide="shield-alert" class="h-5 w-5"></i> 24-hour cancellation policy warnings</div> <div class="flex items-center gap-3"><i data-lucide="badge-check" class="h-5 w-5"></i> Check-in to prevent no-show auto-cancel</div> </div> </div> </div> </section> <section id="appShell" class="hidden min-h-screen"> <header class="sticky top-0 z-30 border-b border-slate-200 bg-white"> <div class="flex h-16 items-center justify-between px-4 md:px-6"> <div class="flex items-center gap-3"> <button class="rounded-md border border-slate-200 p-2 text-slate-600 md:hidden" onclick="toggleSidebar()" title="Open menu"> <i data-lucide="menu" class="h-5 w-5"></i> </button> <div class="flex h-10 w-10 items-center justify-center rounded-md bg-sky-700 text-white"> <i data-lucide="building-2" class="h-5 w-5"></i> </div> <div> <p id="headerContextLabel" class="text-xs font-medium text-slate-500">MMU Role Portal</p> <h1 class="text-base font-semibold">Campus Resource Booking</h1> </div> </div> <div class="flex items-center gap-2"> <button class="relative rounded-md border border-slate-200 p-2 text-slate-600 hover:bg-slate-50" title="Notifications" onclick="showToast('Notifications', 'You have 2 alerts: maintenance change and check-in reminder.')"> <i data-lucide="bell" class="h-5 w-5"></i> <span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-rose-500"></span> </button> <button class="hidden items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm hover:bg-slate-50 sm:flex" onclick="showPage('profile')"> <i data-lucide="user-round" class="h-4 w-4"></i> <span id="headerUserName">Dr. Aisyah</span> <span id="headerRoleBadge" class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">Staff</span> </button> </div> </div> </header> <div class="flex"> <aside id="sidebar" class="fixed inset-y-16 left-0 z-20 hidden w-72 border-r border-slate-200 bg-white p-4 md:sticky md:block md:h-[calc(100vh-4rem)]"> <nav class="space-y-2"> <button class="nav-btn active flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50" data-page="dashboard" data-roles="student,staff,manager,admin" onclick="showPage('dashboard')"> <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard & Alerts </button> <button class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50" data-page="search" data-roles="student,staff" onclick="showPage('search')"> <i data-lucide="search" class="h-4 w-4"></i> Search & Book </button> <button class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50" data-page="bookings" data-roles="student,staff" onclick="showPage('bookings')"> <i data-lucide="calendar-days" class="h-4 w-4"></i> Manage Bookings </button> <button class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50" data-page="equipment" data-roles="staff,manager,admin" onclick="showPage('equipment')"> <i data-lucide="projector" class="h-4 w-4"></i> Specialized Equipment </button> <button class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50" data-page="approvals" data-roles="manager,admin" onclick="showPage('approvals')"> <i data-lucide="clipboard-check" class="h-4 w-4"></i> Approvals </button> <button class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50" data-page="profile" data-roles="student,staff,manager,admin" onclick="showPage('profile')"> <i data-lucide="settings" class="h-4 w-4"></i> Profile Settings </button> </nav> <div class="mt-6 rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900"> <div class="mb-2 flex items-center gap-2 font-semibold"> <i data-lucide="clock-alert" class="h-4 w-4"></i> Policy Reminder </div> <p>Bookings cannot be modified or cancelled within 24 hours of the start time.</p> </div> </aside> <main class="min-w-0 flex-1 p-4 md:p-6"> <section id="dashboard" class="screen active"> <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"> <div> <h2 id="dashboardTitle" class="text-2xl font-semibold">Dashboard & Alerts</h2> <p id="dashboardSubtitle" class="text-sm text-slate-600">Calendar overview, pending actions, maintenance warnings, and check-in reminders.</p> </div> <button id="dashboardPrimaryBtn" onclick="handleDashboardPrimaryAction()" class="flex items-center justify-center gap-2 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-800"> <span id="dashboardPrimaryIconWrap"><i data-lucide="plus" class="h-4 w-4"></i></span> <span id="dashboardPrimaryText">New Booking</span> </button> </div> <div class="grid gap-4 lg:grid-cols-3"> <div class="rounded-md border border-slate-200 bg-white p-4"> <p id="dashMetric1Label" class="text-sm text-slate-500">Upcoming bookings</p> <p id="dashMetric1Value" class="mt-2 text-3xl font-semibold">4</p> </div> <div id="dashMetric2Card" class="rounded-md border border-amber-200 bg-amber-50 p-4"> <p id="dashMetric2Label" class="text-sm text-amber-800">Check-in required</p> <p id="dashMetric2Value" class="mt-2 text-3xl font-semibold text-amber-950">1</p> </div> <div class="rounded-md border border-slate-200 bg-white p-4"> <p id="dashMetric3Label" class="text-sm text-slate-500">Approval pending</p> <p id="dashMetric3Value" class="mt-2 text-3xl font-semibold">2</p> </div> </div> <div class="mt-5 grid gap-5 xl:grid-cols-[1.35fr_0.65fr]"> <div class="rounded-md border border-slate-200 bg-white"> <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3"> <h3 id="dashboardMainPanelTitle" class="font-semibold">Weekly Calendar</h3> <div class="flex gap-2"> <button class="rounded-md border border-slate-200 p-2 text-slate-600" title="Previous week"><i data-lucide="chevron-left" class="h-4 w-4"></i></button> <button class="rounded-md border border-slate-200 p-2 text-slate-600" title="Next week"><i data-lucide="chevron-right" class="h-4 w-4"></i></button> </div> </div> <div id="dashboardMainPanelContent" class="grid grid-cols-1 divide-y divide-slate-200 md:grid-cols-5 md:divide-x md:divide-y-0"> <div class="calendar-cell p-3"> <p class="mb-3 text-sm font-semibold">Mon</p> <div class="rounded-md bg-sky-50 p-2 text-xs text-sky-950">10:00 Lab A-203<br />Software Engineering Tutorial</div> </div> <div class="calendar-cell p-3"> <p class="mb-3 text-sm font-semibold">Tue</p> <div class="rounded-md bg-amber-50 p-2 text-xs text-amber-950">14:00 Meeting Room B<br />Check-in opens 13:45</div> </div> <div class="calendar-cell p-3"> <p class="mb-3 text-sm font-semibold">Wed</p> <div class="rounded-md bg-slate-100 p-2 text-xs text-slate-700">No bookings</div> </div> <div class="calendar-cell p-3"> <p class="mb-3 text-sm font-semibold">Thu</p> <div class="rounded-md bg-emerald-50 p-2 text-xs text-emerald-950">09:00 Seminar Room<br />Recurring weekly</div> </div> <div class="calendar-cell p-3"> <p class="mb-3 text-sm font-semibold">Fri</p> <div class="rounded-md bg-rose-50 p-2 text-xs text-rose-950">Projector P-04<br />Maintenance conflict</div> </div> </div> </div> <div id="dashboardSidePanel" class="space-y-4"> <div class="rounded-md border border-amber-200 bg-amber-50 p-4"> <div class="mb-2 flex items-center gap-2 font-semibold text-amber-950"> <i data-lucide="badge-check" class="h-4 w-4"></i> Check-In Required </div> <p class="mb-3 text-sm text-amber-900">Meeting Room B starts today at 14:00. Confirm attendance to avoid auto-cancel.</p> <button onclick="showToast('Attendance confirmed', 'Your booking will not be auto-cancelled as a no-show.')" class="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-800">Confirm Attendance</button> </div> <div class="rounded-md border border-rose-200 bg-white p-4"> <div class="mb-2 flex items-center gap-2 font-semibold text-rose-700"> <i data-lucide="wrench" class="h-4 w-4"></i> Maintenance Alert </div> <p class="text-sm text-slate-700">Projector P-04 is unavailable Friday 13:00-17:00. Affected bookings will receive email alerts.</p> </div> <div class="rounded-md border border-slate-200 bg-white p-4"> <div class="mb-2 flex items-center gap-2 font-semibold"> <i data-lucide="refresh-cw" class="h-4 w-4"></i> Auto-Cancel Status </div> <p class="text-sm text-slate-700">No-show detection runs 15 minutes after the start time if no check-in is recorded.</p> </div> </div> </div> </section> <section id="search" class="screen"> <div class="mb-5"> <h2 class="text-2xl font-semibold">Search & Book Resources</h2> <p class="text-sm text-slate-600">Find available rooms, labs, and equipment by resource type, date, time, and capacity.</p> </div> <div class="rounded-md border border-slate-200 bg-white p-4"> <div class="grid gap-4 lg:grid-cols-5"> <label class="block text-sm font-medium">Resource type <select class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"> <option>All resources</option> <option>Meeting room</option> <option>Computer lab</option> <option>Projector</option> <option>AV equipment</option> </select> </label> <label class="block text-sm font-medium">Date <input type="date" value="2026-06-09" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /> </label> <label class="block text-sm font-medium">Start time <input type="time" value="10:00" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /> </label> <label class="block text-sm font-medium">Capacity <input type="number" value="30" min="1" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /> </label> <div class="flex items-end"> <button onclick="showToast('Search updated', 'Available resources are filtered using your selected criteria.')" class="flex w-full items-center justify-center gap-2 rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white"> <i data-lucide="search" class="h-4 w-4"></i> Search </button> </div> </div> </div> <div class="mt-5 grid gap-4 xl:grid-cols-3"> <article class="rounded-md border border-slate-200 bg-white p-4"> <div class="mb-3 flex items-start justify-between gap-3"> <div> <h3 class="font-semibold">Meeting Room B-214</h3> <p class="text-sm text-slate-600">Capacity 24 | Faculty Building</p> </div> <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Available</span> </div> <p class="mb-4 text-sm text-slate-700">Whiteboard, video conference camera, HDMI display.</p> <div class="flex flex-wrap gap-2"> <button onclick="openModal('bookingModal')" class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white">Book</button> <button onclick="openModal('recurringModal')" class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold">Recurring</button> </div> </article> <article class="rounded-md border border-slate-200 bg-white p-4"> <div class="mb-3 flex items-start justify-between gap-3"> <div> <h3 class="font-semibold">Computer Lab A-203</h3> <p class="text-sm text-slate-600">Capacity 40 | FCI Block</p> </div> <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Available</span> </div> <p class="mb-4 text-sm text-slate-700">40 PCs, projector, instructor station, wired network.</p> <div class="flex flex-wrap gap-2"> <button onclick="openModal('bookingModal')" class="rounded-md bg-sky-700 px-3 py-2 text-sm font-semibold text-white">Book</button> <button onclick="openModal('recurringModal')" class="rounded-md border border-slate-300 px-3 py-2 text-sm font-semibold">Recurring</button> </div> </article> <article class="rounded-md border border-amber-200 bg-amber-50 p-4"> <div class="mb-3 flex items-start justify-between gap-3"> <div> <h3 class="font-semibold">Projector P-04</h3> <p class="text-sm text-amber-900">Specialized equipment</p> </div> <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">Approval required</span> </div> <p class="mb-4 text-sm text-amber-950">High-lumen projector. Admin approval is required before confirmation.</p> <button onclick="openModal('equipmentModal')" class="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white">Request Approval</button> </article> </div> </section> <section id="bookings" class="screen"> <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"> <div> <h2 class="text-2xl font-semibold">Manage Bookings</h2> <p class="text-sm text-slate-600">Modify, cancel, check in, or review booking status and no-show outcomes.</p> </div> <button onclick="showPage('search')" class="flex items-center justify-center gap-2 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white"> <i data-lucide="plus" class="h-4 w-4"></i> Create Booking </button> </div> <div class="overflow-hidden rounded-md border border-slate-200 bg-white"> <div class="overflow-x-auto"> <table class="w-full min-w-[880px] text-left text-sm"> <thead class="border-b border-slate-200 bg-slate-50 text-slate-600"> <tr> <th class="px-4 py-3 font-semibold">Resource</th> <th class="px-4 py-3 font-semibold">Date & Time</th> <th class="px-4 py-3 font-semibold">Purpose</th> <th class="px-4 py-3 font-semibold">Status</th> <th class="px-4 py-3 font-semibold">Actions</th> </tr> </thead> <tbody class="divide-y divide-slate-200"> <tr> <td class="px-4 py-4 font-medium">Meeting Room B-214</td> <td class="px-4 py-4">Today, 14:00-15:30</td> <td class="px-4 py-4">Research group discussion</td> <td class="px-4 py-4"><span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">Check-in required</span></td> <td class="px-4 py-4"> <div class="flex flex-wrap gap-2"> <button onclick="showToast('Attendance confirmed', 'No-show auto-cancel will not apply to this booking.')" class="rounded-md bg-amber-700 px-3 py-2 text-xs font-semibold text-white">Check In</button> <button onclick="openModal('policyModal')" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Cancel</button> </div> </td> </tr> <tr> <td class="px-4 py-4 font-medium">Computer Lab A-203</td> <td class="px-4 py-4">09 Jun 2026, 10:00-12:00</td> <td class="px-4 py-4">Software Engineering lab</td> <td class="px-4 py-4"><span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Confirmed</span></td> <td class="px-4 py-4"> <div class="flex flex-wrap gap-2"> <button onclick="openModal('modifyModal')" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Modify</button> <button onclick="openModal('cancelModal')" class="rounded-md border border-rose-300 px-3 py-2 text-xs font-semibold text-rose-700">Cancel</button> </div> </td> </tr> <tr> <td class="px-4 py-4 font-medium">Projector P-04</td> <td class="px-4 py-4">12 Jun 2026, 13:00-16:00</td> <td class="px-4 py-4">Guest lecture</td> <td class="px-4 py-4"><span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">Pending approval</span></td> <td class="px-4 py-4"><button onclick="showToast('Request viewed', 'Approval request details opened for review.')" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">View</button></td> </tr> <tr> <td class="px-4 py-4 font-medium">Seminar Room C-101</td> <td class="px-4 py-4">01 Jun 2026, 09:00-10:00</td> <td class="px-4 py-4">Advising session</td> <td class="px-4 py-4"><span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">Auto-cancelled no-show</span></td> <td class="px-4 py-4"><button onclick="showToast('Record opened', 'No-show cancellation reason and timestamp are available in audit history.')" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Details</button></td> </tr> </tbody> </table> </div> </div> </section> <section id="equipment" class="screen"> <div class="mb-5"> <h2 class="text-2xl font-semibold">Specialized Equipment Request</h2> <p class="text-sm text-slate-600">Submit requests that require resource manager or admin approval before confirmation.</p> </div> <div class="grid gap-5 xl:grid-cols-[0.85fr_1.15fr]"> <form class="rounded-md border border-slate-200 bg-white p-4" onsubmit="event.preventDefault(); showToast('Request submitted', 'Admin approval workflow has been triggered.');"> <div class="grid gap-4"> <label class="block text-sm font-medium">Equipment <select class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"> <option>High-lumen projector P-04</option> <option>Wireless microphone set</option> <option>Video conference kit</option> </select> </label> <label class="block text-sm font-medium">Purpose <textarea class="mt-2 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">Guest lecture with external speaker</textarea> </label> <div class="grid gap-4 md:grid-cols-2"> <label class="block text-sm font-medium">Date <input type="date" value="2026-06-12" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /> </label> <label class="block text-sm font-medium">Attendees <input type="number" value="80" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /> </label> </div> <div class="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950"> <div class="flex gap-2"> <i data-lucide="shield-alert" class="mt-0.5 h-4 w-4"></i> <p>This request will remain pending until a resource manager approves it.</p> </div> </div> <button class="flex items-center justify-center gap-2 rounded-md bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white"> <i data-lucide="send" class="h-4 w-4"></i> Submit Request </button> </div> </form> <div class="rounded-md border border-slate-200 bg-white p-4"> <h3 class="mb-3 font-semibold">Approval Workflow</h3> <div class="space-y-3 text-sm"> <div class="flex gap-3 rounded-md bg-slate-50 p-3"> <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-700 text-xs font-semibold text-white">1</span> <div><p class="font-medium">Staff submits request</p><p class="text-slate-600">Purpose, resource, date, time, and attendees are recorded.</p></div> </div> <div class="flex gap-3 rounded-md bg-slate-50 p-3"> <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-700 text-xs font-semibold text-white">2</span> <div><p class="font-medium">Resource manager reviews</p><p class="text-slate-600">Availability, maintenance status, and suitability are checked.</p></div> </div> <div class="flex gap-3 rounded-md bg-slate-50 p-3"> <span class="flex h-7 w-7 items-center justify-center rounded-full bg-sky-700 text-xs font-semibold text-white">3</span> <div><p class="font-medium">Notification sent</p><p class="text-slate-600">Staff receives approval, rejection, or modification request.</p></div> </div> </div> </div> </div> </section> <section id="approvals" class="screen"> <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"> <div> <h2 class="text-2xl font-semibold">Approval Management</h2> <p class="text-sm text-slate-600">Review specialized equipment requests, resolve booking conflicts, and update resource availability.</p> </div> <button onclick="showToast('Report generated', 'Approval queue and resource status summary is ready for export.')" class="flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-50"> <i data-lucide="file-down" class="h-4 w-4"></i> Export Report </button> </div> <div class="grid gap-4 lg:grid-cols-3"> <div class="rounded-md border border-slate-200 bg-white p-4"> <p class="text-sm text-slate-500">Pending approvals</p> <p class="mt-2 text-3xl font-semibold">5</p> </div> <div class="rounded-md border border-rose-200 bg-rose-50 p-4"> <p class="text-sm text-rose-800">Maintenance conflicts</p> <p class="mt-2 text-3xl font-semibold text-rose-950">2</p> </div> <div class="rounded-md border border-slate-200 bg-white p-4"> <p class="text-sm text-slate-500">Approved today</p> <p class="mt-2 text-3xl font-semibold">7</p> </div> </div> <div class="mt-5 grid gap-5 xl:grid-cols-[1.35fr_0.65fr]"> <div class="overflow-hidden rounded-md border border-slate-200 bg-white"> <div class="border-b border-slate-200 px-4 py-3"> <h3 class="font-semibold">Pending Approval Queue</h3> </div> <div class="overflow-x-auto"> <table class="w-full min-w-[760px] text-left text-sm"> <thead class="border-b border-slate-200 bg-slate-50 text-slate-600"> <tr> <th class="px-4 py-3 font-semibold">Requester</th> <th class="px-4 py-3 font-semibold">Resource</th> <th class="px-4 py-3 font-semibold">Purpose</th> <th class="px-4 py-3 font-semibold">Risk</th> <th class="px-4 py-3 font-semibold">Decision</th> </tr> </thead> <tbody class="divide-y divide-slate-200"> <tr> <td class="px-4 py-4">Dr. Aisyah Rahman</td> <td class="px-4 py-4 font-medium">Projector P-04</td> <td class="px-4 py-4">Guest lecture</td> <td class="px-4 py-4"><span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">Maintenance nearby</span></td> <td class="px-4 py-4"> <div class="flex flex-wrap gap-2"> <button onclick="showToast('Request approved', 'Requester has been notified by email.')" class="rounded-md bg-emerald-700 px-3 py-2 text-xs font-semibold text-white">Approve</button> <button onclick="openModal('rejectModal')" class="rounded-md border border-rose-300 px-3 py-2 text-xs font-semibold text-rose-700">Reject</button> </div> </td> </tr> <tr> <td class="px-4 py-4">Prof. Lim Wei</td> <td class="px-4 py-4 font-medium">Wireless mic set</td> <td class="px-4 py-4">Seminar event</td> <td class="px-4 py-4"><span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Clear</span></td> <td class="px-4 py-4"> <div class="flex flex-wrap gap-2"> <button onclick="showToast('Request approved', 'Wireless mic set booking is now confirmed.')" class="rounded-md bg-emerald-700 px-3 py-2 text-xs font-semibold text-white">Approve</button> <button onclick="openModal('rejectModal')" class="rounded-md border border-rose-300 px-3 py-2 text-xs font-semibold text-rose-700">Reject</button> </div> </td> </tr> <tr> <td class="px-4 py-4">Student Society</td> <td class="px-4 py-4 font-medium">Seminar Room C-101</td> <td class="px-4 py-4">Club workshop</td> <td class="px-4 py-4"><span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">Capacity conflict</span></td> <td class="px-4 py-4"> <div class="flex flex-wrap gap-2"> <button onclick="showToast('Alternative suggested', 'Requester has been offered Lab A-203 instead.')" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Suggest Alternative</button> </div> </td> </tr> </tbody> </table> </div> </div> <div class="space-y-4"> <div class="rounded-md border border-slate-200 bg-white p-4"> <h3 class="mb-3 font-semibold">Resource Status Update</h3> <div class="grid gap-3 text-sm"> <label class="block font-medium">Resource <select class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"> <option>Projector P-04</option> <option>Meeting Room B-214</option> <option>Computer Lab A-203</option> </select> </label> <label class="block font-medium">Status <select class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"> <option>Available</option> <option>Maintenance</option> <option>Faulty</option> </select> </label> <button onclick="showToast('Resource updated', 'Affected users will receive maintenance notifications.')" class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Save Status</button> </div> </div> <div class="rounded-md border border-amber-200 bg-amber-50 p-4"> <div class="mb-2 flex items-center gap-2 font-semibold text-amber-950"> <i data-lucide="shield-alert" class="h-4 w-4"></i> Admin Control </div> <p class="text-sm text-amber-900">Approving a specialized resource creates a confirmed booking and sends notification to the requester.</p> </div> </div> </div> </section> <section id="profile" class="screen"> <div class="mb-5"> <h2 class="text-2xl font-semibold">Profile Settings</h2> <p class="text-sm text-slate-600">Manage contact information, department details, password, and notification preferences.</p> </div> <div class="grid gap-5 xl:grid-cols-[1fr_0.75fr]"> <form class="rounded-md border border-slate-200 bg-white p-4" onsubmit="event.preventDefault(); showToast('Profile updated', 'Your staff profile and contact details were saved.');"> <div class="grid gap-4 md:grid-cols-2"> <label class="block text-sm font-medium">Full name <input value="Dr. Aisyah Rahman" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /> </label> <label class="block text-sm font-medium">Department <input value="Faculty of Computing and Informatics" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /> </label> <label class="block text-sm font-medium">Email <input value="lecturer@mmu.edu.my" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /> </label> <label class="block text-sm font-medium">Phone <input value="+60 12-345 6789" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" /> </label> </div> <div class="mt-5 border-t border-slate-200 pt-5"> <h3 class="mb-3 font-semibold">Change Password</h3> <div class="grid gap-4 md:grid-cols-2"> <input type="password" placeholder="New password" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> <input type="password" placeholder="Confirm password" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> </div> </div> <button class="mt-5 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white">Save Profile</button> </form> <div class="rounded-md border border-slate-200 bg-white p-4"> <h3 class="mb-3 font-semibold">Notification Preferences</h3> <div class="space-y-3 text-sm"> <label class="flex items-center justify-between gap-3 rounded-md border border-slate-200 p-3"> <span>Email confirmations</span> <input type="checkbox" checked class="h-4 w-4" /> </label> <label class="flex items-center justify-between gap-3 rounded-md border border-slate-200 p-3"> <span>Check-in reminders</span> <input type="checkbox" checked class="h-4 w-4" /> </label> <label class="flex items-center justify-between gap-3 rounded-md border border-slate-200 p-3"> <span>Maintenance alerts</span> <input type="checkbox" checked class="h-4 w-4" /> </label> </div> </div> <div class="rounded-md border border-rose-200 bg-rose-50 p-4"> <h3 class="mb-2 font-semibold text-rose-950">Session</h3> <p class="mb-4 text-sm text-rose-900">Log out to return to the login screen and test another user role.</p> <button onclick="logout()" class="flex w-full items-center justify-center gap-2 rounded-md bg-rose-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-800"> <i data-lucide="log-out" class="h-4 w-4"></i> Log Out </button> </div> </div> </section> </main> </div> </section> <div id="bookingModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4"> <div class="w-full max-w-lg rounded-lg bg-white shadow-xl"> <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4"> <h3 class="font-semibold">Create Single Booking</h3> <button onclick="closeModal('bookingModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button> </div> <form class="p-5" onsubmit="event.preventDefault(); closeModal('bookingModal'); showToast('Booking confirmed', 'Meeting Room B-214 has been reserved.');"> <div class="grid gap-4"> <input value="Meeting Room B-214" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> <textarea class="min-h-20 rounded-md border border-slate-300 px-3 py-2 text-sm">Research group discussion</textarea> <div class="grid gap-4 md:grid-cols-2"> <input type="datetime-local" value="2026-06-09T10:00" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> <input type="datetime-local" value="2026-06-09T12:00" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> </div> <input type="number" value="20" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> </div> <div class="mt-5 flex justify-end gap-2"> <button type="button" onclick="closeModal('bookingModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button> <button class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Confirm Booking</button> </div> </form> </div> </div> <div id="recurringModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4"> <div class="w-full max-w-lg rounded-lg bg-white shadow-xl"> <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4"> <h3 class="font-semibold">Create Recurring Booking</h3> <button onclick="closeModal('recurringModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button> </div> <form class="p-5" onsubmit="event.preventDefault(); closeModal('recurringModal'); showToast('Recurring booking created', 'Weekly booking pattern has been saved.');"> <div class="grid gap-4"> <select class="rounded-md border border-slate-300 px-3 py-2 text-sm"> <option>Weekly</option> <option>Monthly</option> </select> <div class="grid gap-4 md:grid-cols-2"> <input type="date" value="2026-06-09" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> <input type="date" value="2026-08-25" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> </div> <textarea class="min-h-20 rounded-md border border-slate-300 px-3 py-2 text-sm">Weekly tutorial class</textarea> <div class="rounded-md border border-sky-200 bg-sky-50 p-3 text-sm text-sky-950"> Conflict checking will run across all generated booking dates before submission. </div> </div> <div class="mt-5 flex justify-end gap-2"> <button type="button" onclick="closeModal('recurringModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button> <button class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Create Series</button> </div> </form> </div> </div> <div id="equipmentModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4"> <div class="w-full max-w-lg rounded-lg bg-white shadow-xl"> <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4"> <h3 class="font-semibold">Request Specialized Equipment</h3> <button onclick="closeModal('equipmentModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button> </div> <form class="p-5" onsubmit="event.preventDefault(); closeModal('equipmentModal'); showToast('Approval request sent', 'Resource manager review is now pending.');"> <div class="grid gap-4"> <input value="Projector P-04" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> <textarea class="min-h-20 rounded-md border border-slate-300 px-3 py-2 text-sm">High-lumen projector needed for guest lecture.</textarea> <div class="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">This request is not confirmed until approved by admin.</div> </div> <div class="mt-5 flex justify-end gap-2"> <button type="button" onclick="closeModal('equipmentModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button> <button class="rounded-md bg-amber-700 px-4 py-2 text-sm font-semibold text-white">Send Request</button> </div> </form> </div> </div> <div id="modifyModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4"> <div class="w-full max-w-lg rounded-lg bg-white shadow-xl"> <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4"> <h3 class="font-semibold">Modify Booking</h3> <button onclick="closeModal('modifyModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button> </div> <form class="p-5" onsubmit="event.preventDefault(); closeModal('modifyModal'); showToast('Booking modified', 'Updated booking details were saved.');"> <div class="mb-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">This booking is more than 24 hours away, so modification is allowed.</div> <div class="grid gap-4 md:grid-cols-2"> <input type="datetime-local" value="2026-06-09T10:00" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> <input type="datetime-local" value="2026-06-09T12:00" class="rounded-md border border-slate-300 px-3 py-2 text-sm" /> </div> <div class="mt-5 flex justify-end gap-2"> <button type="button" onclick="closeModal('modifyModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button> <button class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Save Changes</button> </div> </form> </div> </div> <div id="cancelModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4"> <div class="w-full max-w-md rounded-lg bg-white shadow-xl"> <div class="border-b border-slate-200 px-5 py-4"> <h3 class="font-semibold">Cancel Booking</h3> </div> <div class="p-5"> <p class="text-sm text-slate-700">This booking is outside the 24-hour restricted period. Are you sure you want to cancel it?</p> <div class="mt-5 flex justify-end gap-2"> <button onclick="closeModal('cancelModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Keep Booking</button> <button onclick="closeModal('cancelModal'); showToast('Booking cancelled', 'The resource has been released for other users.')" class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Cancel Booking</button> </div> </div> </div> </div> <div id="policyModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4"> <div class="w-full max-w-md rounded-lg bg-white shadow-xl"> <div class="border-b border-slate-200 px-5 py-4"> <h3 class="font-semibold">Action Blocked by Policy</h3> </div> <div class="p-5"> <div class="mb-4 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900"> Bookings cannot be modified or cancelled within 24 hours of the start time. </div> <p class="text-sm text-slate-700">Contact the resource manager if an urgent exception is required.</p> <div class="mt-5 flex justify-end"> <button onclick="closeModal('policyModal')" class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Understood</button> </div> </div> </div> </div> <div id="rejectModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4"> <div class="w-full max-w-md rounded-lg bg-white shadow-xl"> <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4"> <h3 class="font-semibold">Reject Approval Request</h3> <button onclick="closeModal('rejectModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button> </div> <div class="p-5"> <label class="block text-sm font-medium">Reason for rejection <textarea class="mt-2 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">Resource is unavailable due to maintenance.</textarea> </label> <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700"> The requester will receive this reason with the rejection notification. </div> <div class="mt-5 flex justify-end gap-2"> <button onclick="closeModal('rejectModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button> <button onclick="closeModal('rejectModal'); showToast('Request rejected', 'Requester has been notified with the rejection reason.')" class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Reject Request</button> </div> </div> </div> </div> <div id="forgotPasswordModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4"> <div class="w-full max-w-md rounded-lg bg-white shadow-xl"> <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4"> <h3 class="font-semibold">Reset Password</h3> <button onclick="closeModal('forgotPasswordModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button> </div> <form class="p-5" onsubmit="event.preventDefault(); sendResetLink();"> <p class="mb-4 text-sm text-slate-700">Enter your campus email address. The system will send a secure link for resetting your password.</p> <label class="block text-sm font-medium">Email address <input id="resetEmail" type="email" value="lecturer@mmu.edu.my" required class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100" /> </label> <div class="mt-4 rounded-md border border-sky-200 bg-sky-50 p-3 text-sm text-sky-950"> For security, the reset link expires after a limited time and can only be used once. </div> <div class="mt-5 flex justify-end gap-2"> <button type="button" onclick="closeModal('forgotPasswordModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button> <button class="flex items-center gap-2 rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white"> <i data-lucide="mail" class="h-4 w-4"></i> Send Reset Link </button> </div> </form> </div> </div>
+  <script>
+    var activeRole = 'staff';
+    function byId(id) {
+      return document.getElementById(id);
+    }
+    function setText(id, value) {
+      byId(id).textContent = value;
+    }
+    var roleProfiles = {
+      student: {
+        label: 'Student',
+        userName: 'Nur Iman',
+        defaultPage: 'dashboard',
+        message: 'Student access shows booking, check-in, and personal profile pages.'
+      },
+      staff: {
+        label: 'Staff / Faculty',
+        userName: 'Dr. Aisyah',
+        defaultPage: 'dashboard',
+        message: 'Staff access includes booking, recurring booking, and specialized equipment requests.'
+      },
+      manager: {
+        label: 'Resource Manager',
+        userName: 'Mr. Daniel',
+        defaultPage: 'dashboard',
+        message: 'Resource Manager access includes approval and resource status controls.'
+      },
+      admin: {
+        label: 'Admin',
+        userName: 'Admin User',
+        defaultPage: 'dashboard',
+        message: 'Admin access includes approval management and system-level resource decisions.'
+      }
+    };
+    var toneClasses = {
+      amber: 'border-amber-200 bg-amber-50 text-amber-950',
+      emerald: 'border-emerald-200 bg-emerald-50 text-emerald-950',
+      rose: 'border-rose-200 bg-rose-50 text-rose-900',
+      sky: 'border-sky-200 bg-sky-50 text-sky-950',
+      slate: 'border-slate-200 bg-white text-slate-900'
+    };
+    function calendarHtml(events) {
+      return events.map(function(event) {
+        return '<div class="calendar-cell p-3">' +
+          '<p class="mb-3 text-sm font-semibold">' + event.day + '</p>' +
+          '<div class="rounded-md ' + event.className + ' p-2 text-xs">' +
+          event.title + '<br />' + event.detail +
+          '</div></div>';
+      }).join('');
+    }
+    function sideCardsHtml(cards) {
+      return cards.map(function(card) {
+        var button = card.buttonText
+          ? '<button onclick="' + card.action + '" class="rounded-md ' + card.buttonClass + ' px-3 py-2 text-sm font-semibold">' + card.buttonText + '</button>'
+          : '';
+        return '<div class="rounded-md border ' + toneClasses[card.tone] + ' p-4">' +
+          '<div class="mb-2 flex items-center gap-2 font-semibold"><i data-lucide="' + card.icon + '" class="h-4 w-4"></i> ' + card.title + '</div>' +
+          '<p class="' + (button ? 'mb-3 ' : '') + 'text-sm">' + card.text + '</p>' +
+          button +
+          '</div>';
+      }).join('');
+    }
+    function queueHtml(rows) {
+      var body = rows.map(function(row) {
+        return '<tr><td class="px-4 py-3">' + row.request + '</td>' +
+          '<td class="px-4 py-3">' + row.status + '</td>' +
+          '<td class="px-4 py-3"><span class="rounded-full ' + row.badgeClass + ' px-2 py-1 text-xs font-semibold">' + row.priority + '</span></td></tr>';
+      }).join('');
+      return '<div class="p-4"><div class="overflow-hidden rounded-md border border-slate-200">' +
+        '<table class="w-full text-left text-sm"><thead class="bg-slate-50 text-slate-600">' +
+        '<tr><th class="px-4 py-3 font-semibold">Request</th><th class="px-4 py-3 font-semibold">Status</th><th class="px-4 py-3 font-semibold">Priority</th></tr>' +
+        '</thead><tbody class="divide-y divide-slate-200">' + body + '</tbody></table></div></div>';
+    }
+    function overviewGridHtml(items) {
+      return '<div class="grid gap-4 p-4 md:grid-cols-2">' + items.map(function(item) {
+        return '<div class="rounded-md border border-slate-200 p-4">' +
+          '<p class="text-sm text-slate-500">' + item.label + '</p>' +
+          '<p class="mt-2 ' + item.valueClass + '">' + item.value + '</p>' +
+          '</div>';
+      }).join('') + '</div>';
+    }
+    var dashboardProfiles = {
+      student: {
+        title: 'Student Booking Dashboard',
+        subtitle: 'Track personal room bookings, check-in reminders, and booking policy alerts.',
+        primaryText: 'Find Resource',
+        primaryIcon: 'search',
+        primaryTarget: 'search',
+        metrics: [
+          ['My upcoming bookings', '2'],
+          ['Check-in required', '1'],
+          ['Cancelled bookings', '0']
+        ],
+        panelTitle: 'My Weekly Booking Calendar',
+        mainHtml: calendarHtml([
+          { day: 'Mon', className: 'bg-sky-50 text-sky-950', title: '11:00 Study Room S-02', detail: 'Group assignment' },
+          { day: 'Tue', className: 'bg-amber-50 text-amber-950', title: '14:00 Lab A-203', detail: 'Check-in opens 13:45' },
+          { day: 'Wed', className: 'bg-slate-100 text-slate-700', title: 'No bookings', detail: '&nbsp;' },
+          { day: 'Thu', className: 'bg-slate-100 text-slate-700', title: 'No bookings', detail: '&nbsp;' },
+          { day: 'Fri', className: 'bg-emerald-50 text-emerald-950', title: '16:00 Meeting Pod', detail: 'Confirmed' }
+        ]),
+        sideHtml: sideCardsHtml([
+          {
+            tone: 'amber',
+            icon: 'badge-check',
+            title: 'Student Check-In',
+            text: 'Lab A-203 starts today at 14:00. Confirm attendance to avoid auto-cancel.',
+            buttonText: 'Confirm Attendance',
+            buttonClass: 'bg-amber-700 text-white hover:bg-amber-800',
+            action: "showToast('Attendance confirmed', 'Your student booking will not be auto-cancelled.')"
+          },
+          {
+            tone: 'slate',
+            icon: 'info',
+            title: 'Booking Rule',
+            text: 'Students can book shared study spaces and selected labs according to campus policy.'
+          }
+        ])
+      },
+      staff: {
+        title: 'Staff/Faculty Dashboard',
+        subtitle: 'Monitor teaching bookings, recurring sessions, equipment requests, and maintenance alerts.',
+        primaryText: 'New Booking',
+        primaryIcon: 'plus',
+        primaryTarget: 'search',
+        metrics: [
+          ['Upcoming bookings', '4'],
+          ['Check-in required', '1'],
+          ['Approval pending', '2']
+        ],
+        panelTitle: 'Teaching & Meeting Calendar',
+        mainHtml: calendarHtml([
+          { day: 'Mon', className: 'bg-sky-50 text-sky-950', title: '10:00 Lab A-203', detail: 'Software Engineering Tutorial' },
+          { day: 'Tue', className: 'bg-amber-50 text-amber-950', title: '14:00 Meeting Room B', detail: 'Check-in opens 13:45' },
+          { day: 'Wed', className: 'bg-slate-100 text-slate-700', title: 'No bookings', detail: '&nbsp;' },
+          { day: 'Thu', className: 'bg-emerald-50 text-emerald-950', title: '09:00 Seminar Room', detail: 'Recurring weekly' },
+          { day: 'Fri', className: 'bg-rose-50 text-rose-950', title: 'Projector P-04', detail: 'Maintenance conflict' }
+        ]),
+        sideHtml: sideCardsHtml([
+          {
+            tone: 'amber',
+            icon: 'badge-check',
+            title: 'Check-In Required',
+            text: 'Meeting Room B starts today at 14:00. Confirm attendance to avoid auto-cancel.',
+            buttonText: 'Confirm Attendance',
+            buttonClass: 'bg-amber-700 text-white hover:bg-amber-800',
+            action: "showToast('Attendance confirmed', 'Your booking will not be auto-cancelled as a no-show.')"
+          },
+          {
+            tone: 'rose',
+            icon: 'wrench',
+            title: 'Maintenance Alert',
+            text: 'Projector P-04 is unavailable Friday 13:00-17:00. Affected bookings will receive email alerts.'
+          },
+          {
+            tone: 'slate',
+            icon: 'refresh-cw',
+            title: 'Auto-Cancel Status',
+            text: 'No-show detection runs 15 minutes after the start time if no check-in is recorded.'
+          }
+        ])
+      },
+      manager: {
+        title: 'Resource Manager Dashboard',
+        subtitle: 'Focus on pending approvals, resource availability, maintenance conflicts, and operational follow-up.',
+        primaryText: 'Review Approvals',
+        primaryIcon: 'clipboard-check',
+        primaryTarget: 'approvals',
+        metrics: [
+          ['Pending approvals', '5'],
+          ['Maintenance conflicts', '2'],
+          ['Resources unavailable', '3']
+        ],
+        panelTitle: 'Approval & Resource Queue',
+        mainHtml: queueHtml([
+          { request: 'Projector P-04 for guest lecture', status: 'Pending review', priority: 'Medium', badgeClass: 'bg-amber-50 text-amber-800' },
+          { request: 'Seminar Room capacity conflict', status: 'Needs alternative', priority: 'High', badgeClass: 'bg-rose-50 text-rose-700' },
+          { request: 'Wireless mic set', status: 'Ready to approve', priority: 'Low', badgeClass: 'bg-emerald-50 text-emerald-700' }
+        ]),
+        sideHtml: sideCardsHtml([
+          {
+            tone: 'rose',
+            icon: 'wrench',
+            title: 'Maintenance Action',
+            text: 'Projector P-04 requires status update before approving related requests.'
+          },
+          {
+            tone: 'slate',
+            icon: 'clipboard-check',
+            title: 'Approval Reminder',
+            text: 'Review specialized equipment requests before the requested booking date.',
+            buttonText: 'Open Approvals',
+            buttonClass: 'bg-sky-700 text-white',
+            action: "showPage('approvals')"
+          }
+        ])
+      },
+      admin: {
+        title: 'Admin Control Dashboard',
+        subtitle: 'View system-wide approval workload, resource health, usage risk, and administrative actions.',
+        primaryText: 'Manage Approvals',
+        primaryIcon: 'shield-check',
+        primaryTarget: 'approvals',
+        metrics: [
+          ['System approvals', '12'],
+          ['Policy exceptions', '3'],
+          ['Resource issues', '4']
+        ],
+        panelTitle: 'System Operations Overview',
+        mainHtml: overviewGridHtml([
+          { label: 'Today usage rate', value: '78%', valueClass: 'text-2xl font-semibold' },
+          { label: 'No-show rate', value: '6%', valueClass: 'text-2xl font-semibold' },
+          { label: 'Most requested resource', value: 'Computer Lab A-203', valueClass: 'font-semibold' },
+          { label: 'Departments active', value: '9', valueClass: 'text-2xl font-semibold' }
+        ]),
+        sideHtml: sideCardsHtml([
+          {
+            tone: 'amber',
+            icon: 'shield-alert',
+            title: 'Admin Priority',
+            text: 'Three policy exception requests need admin decision before confirmation.'
+          },
+          {
+            tone: 'slate',
+            icon: 'bar-chart-3',
+            title: 'Reporting Focus',
+            text: 'Use approval and utilization reports to monitor compliance and resource demand.',
+            buttonText: 'Generate Report',
+            buttonClass: 'bg-sky-700 text-white',
+            action: "showToast('Admin report generated', 'System usage summary is ready for review.')"
+          }
+        ])
+      }
+    };
+    function enterApp() {
+      activeRole = byId('loginRole').value;
+      applyRoleAccess();
+      byId('loginScreen').classList.add('hidden');
+      byId('appShell').classList.remove('hidden');
+      showPage(roleProfiles[activeRole].defaultPage);
+      showToast('Signed in as ' + roleProfiles[activeRole].label, roleProfiles[activeRole].message);
+    }
+    function showPage(pageId) {
+      if (!roleCanAccess(pageId)) {
+        pageId = roleProfiles[activeRole].defaultPage;
+        showToast('Access restricted', 'This page is not available for the selected role.');
+      }
+      document.querySelectorAll('.screen').forEach(function(screen) {
+        screen.classList.toggle('active', screen.id === pageId);
+      });
+      document.querySelectorAll('.nav-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.page === pageId);
+      });
+      if (window.innerWidth < 768) {
+        byId('sidebar').classList.add('hidden');
+      }
+      refreshIcons();
+    }
+    function applyRoleAccess() {
+      var profile = roleProfiles[activeRole];
+      setText('headerUserName', profile.userName);
+      setText('headerRoleBadge', profile.label);
+      setText('headerContextLabel', 'MMU ' + profile.label + ' Portal');
+      applyDashboardContent();
+      document.querySelectorAll('.nav-btn').forEach(function(btn) {
+        var roles = (btn.dataset.roles || '').split(',');
+        btn.classList.toggle('hidden', roles.indexOf(activeRole) === -1);
+      });
+    }
+    function applyDashboardContent() {
+      var dashboard = dashboardProfiles[activeRole];
+      [
+        ['dashboardTitle', dashboard.title],
+        ['dashboardSubtitle', dashboard.subtitle],
+        ['dashboardPrimaryText', dashboard.primaryText],
+        ['dashboardMainPanelTitle', dashboard.panelTitle]
+      ].forEach(function(item) {
+        setText(item[0], item[1]);
+      });
+      dashboard.metrics.forEach(function(metric, index) {
+        setText('dashMetric' + (index + 1) + 'Label', metric[0]);
+        setText('dashMetric' + (index + 1) + 'Value', metric[1]);
+      });
+      byId('dashboardPrimaryBtn').dataset.target = dashboard.primaryTarget;
+      byId('dashboardPrimaryIconWrap').innerHTML = '<i data-lucide="' + dashboard.primaryIcon + '" class="h-4 w-4"></i>';
+      byId('dashboardMainPanelContent').innerHTML = dashboard.mainHtml;
+      byId('dashboardSidePanel').innerHTML = dashboard.sideHtml;
+      refreshIcons();
+    }
+    function handleDashboardPrimaryAction() {
+      var target = byId('dashboardPrimaryBtn').dataset.target || 'dashboard';
+      showPage(target);
+    }
+    function roleCanAccess(pageId) {
+      var navButton = document.querySelector('.nav-btn[data-page="' + pageId + '"]');
+      if (!navButton) {
+        return true;
+      }
+      var roles = (navButton.dataset.roles || '').split(',');
+      return roles.indexOf(activeRole) !== -1;
+    }
+    function toggleSidebar() {
+      byId('sidebar').classList.toggle('hidden');
+    }
+    function logout() {
+      byId('appShell').classList.add('hidden');
+      byId('loginScreen').classList.remove('hidden');
+      showPage('dashboard');
+      showToast('Logged out', 'Choose another demo access role to test a different account view.');
+    }
+    function openModal(id) {
+      if (id === 'forgotPasswordModal') {
+        byId('resetEmail').value = byId('email').value;
+      }
+      byId(id).classList.add('active');
+      refreshIcons();
+    }
+    function closeModal(id) {
+      byId(id).classList.remove('active');
+    }
+    function sendResetLink() {
+      var email = byId('resetEmail').value;
+      closeModal('forgotPasswordModal');
+      showToast('Reset link sent', 'A password reset link has been sent to ' + email + '.');
+    }
+    function showToast(title, message) {
+      var toast = byId('toast');
+      setText('toastTitle', title);
+      setText('toastMessage', message);
+      toast.classList.remove('hidden');
+      window.clearTimeout(window.toastTimer);
+      window.toastTimer = window.setTimeout(function() {
+        toast.classList.add('hidden');
+      }, 3200);
+      refreshIcons();
+    }
+    function refreshIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+    document.addEventListener('DOMContentLoaded', refreshIcons);
+  </script>
+</body> </html>
