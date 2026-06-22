@@ -4,9 +4,9 @@
   <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
       <h3 class="font-semibold">Create Single Booking</h3>
-      <button onclick="closeModal('bookingModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+      <button data-modal-close="bookingModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
     </div>
-    <form class="p-5" onsubmit="event.preventDefault(); closeModal('bookingModal'); showToast('Booking confirmed', 'Meeting Room B-214 has been reserved.');">
+    <form class="p-5" data-modal-close="bookingModal" data-toast data-toast-title="Booking confirmed" data-toast-msg="Meeting Room B-214 has been reserved.">
       <div class="grid gap-4">
         <input value="Meeting Room B-214" class="rounded-md border border-slate-300 px-3 py-2 text-sm" />
         <textarea class="min-h-20 rounded-md border border-slate-300 px-3 py-2 text-sm">Research group discussion</textarea>
@@ -17,7 +17,7 @@
         <input type="number" value="20" class="rounded-md border border-slate-300 px-3 py-2 text-sm" />
       </div>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" onclick="closeModal('bookingModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+        <button type="button" data-modal-close="bookingModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
         <button class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Confirm Booking</button>
       </div>
     </form>
@@ -28,9 +28,9 @@
   <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
       <h3 class="font-semibold">Create Recurring Booking</h3>
-      <button onclick="closeModal('recurringModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+      <button data-modal-close="recurringModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
     </div>
-    <form class="p-5" onsubmit="event.preventDefault(); closeModal('recurringModal'); showToast('Recurring booking created', 'Weekly booking pattern has been saved.');">
+    <form class="p-5" data-modal-close="recurringModal" data-toast data-toast-title="Recurring booking created" data-toast-msg="Weekly booking pattern has been saved.">
       <div class="grid gap-4">
         <select class="rounded-md border border-slate-300 px-3 py-2 text-sm">
           <option>Weekly</option>
@@ -46,7 +46,7 @@
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" onclick="closeModal('recurringModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+        <button type="button" data-modal-close="recurringModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
         <button class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Create Series</button>
       </div>
     </form>
@@ -57,16 +57,16 @@
   <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
       <h3 class="font-semibold">Request Specialized Equipment</h3>
-      <button onclick="closeModal('equipmentModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+      <button data-modal-close="equipmentModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
     </div>
-    <form class="p-5" onsubmit="event.preventDefault(); closeModal('equipmentModal'); showToast('Approval request sent', 'Resource manager review is now pending.');">
+    <form class="p-5" data-modal-close="equipmentModal" data-toast data-toast-title="Approval request sent" data-toast-msg="Resource manager review is now pending.">
       <div class="grid gap-4">
         <input value="Projector P-04" class="rounded-md border border-slate-300 px-3 py-2 text-sm" />
         <textarea class="min-h-20 rounded-md border border-slate-300 px-3 py-2 text-sm">High-lumen projector needed for guest lecture.</textarea>
         <div class="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">This request is not confirmed until approved by admin.</div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" onclick="closeModal('equipmentModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+        <button type="button" data-modal-close="equipmentModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
         <button class="rounded-md bg-amber-700 px-4 py-2 text-sm font-semibold text-white">Send Request</button>
       </div>
     </form>
@@ -77,16 +77,16 @@
   <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
       <h3 class="font-semibold">Modify Booking</h3>
-      <button onclick="closeModal('modifyModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+      <button data-modal-close="modifyModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
     </div>
-    <form class="p-5" onsubmit="event.preventDefault(); closeModal('modifyModal'); showToast('Booking modified', 'Updated booking details were saved.');">
+    <form class="p-5" data-modal-close="modifyModal" data-toast data-toast-title="Booking modified" data-toast-msg="Updated booking details were saved.">
       <div class="mb-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">This booking is more than 24 hours away, so modification is allowed.</div>
       <div class="grid gap-4 md:grid-cols-2">
         <input type="datetime-local" value="2026-06-09T10:00" class="rounded-md border border-slate-300 px-3 py-2 text-sm" />
         <input type="datetime-local" value="2026-06-09T12:00" class="rounded-md border border-slate-300 px-3 py-2 text-sm" />
       </div>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" onclick="closeModal('modifyModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+        <button type="button" data-modal-close="modifyModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
         <button class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Save Changes</button>
       </div>
     </form>
@@ -101,8 +101,8 @@
     <div class="p-5">
       <p class="text-sm text-slate-700">This booking is outside the 24-hour restricted period. Are you sure you want to cancel it?</p>
       <div class="mt-5 flex justify-end gap-2">
-        <button onclick="closeModal('cancelModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Keep Booking</button>
-        <button onclick="closeModal('cancelModal'); showToast('Booking cancelled', 'The resource has been released for other users.')" class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Cancel Booking</button>
+        <button data-modal-close="cancelModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Keep Booking</button>
+        <button data-modal-close="cancelModal" data-toast data-toast-title="Booking cancelled" data-toast-msg="The resource has been released for other users." class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Cancel Booking</button>
       </div>
     </div>
   </div>
@@ -119,7 +119,7 @@
       </div>
       <p class="text-sm text-slate-700">Contact the resource manager if an urgent exception is required.</p>
       <div class="mt-5 flex justify-end">
-        <button onclick="closeModal('policyModal')" class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Understood</button>
+        <button data-modal-close="policyModal" class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Understood</button>
       </div>
     </div>
   </div>
@@ -129,7 +129,7 @@
   <div class="w-full max-w-md rounded-lg bg-white shadow-xl">
     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
       <h3 class="font-semibold">Reject Approval Request</h3>
-      <button onclick="closeModal('rejectModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+      <button data-modal-close="rejectModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
     </div>
     <div class="p-5">
       <label class="block text-sm font-medium">Reason for rejection
@@ -139,8 +139,8 @@
         The requester will receive this reason with the rejection notification.
       </div>
       <div class="mt-5 flex justify-end gap-2">
-        <button onclick="closeModal('rejectModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
-        <button onclick="closeModal('rejectModal'); showToast('Request rejected', 'Requester has been notified with the rejection reason.')" class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Reject Request</button>
+        <button data-modal-close="rejectModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+        <button data-modal-close="rejectModal" data-toast data-toast-title="Request rejected" data-toast-msg="Requester has been notified with the rejection reason." class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Reject Request</button>
       </div>
     </div>
   </div>

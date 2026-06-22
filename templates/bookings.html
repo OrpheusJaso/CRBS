@@ -34,8 +34,8 @@
             <td class="px-4 py-4"><span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">Check-in required</span></td>
             <td class="px-4 py-4">
               <div class="flex flex-wrap gap-2">
-                <button onclick="showToast('Attendance confirmed', 'No-show auto-cancel will not apply to this booking.')" class="rounded-md bg-amber-700 px-3 py-2 text-xs font-semibold text-white">Check In</button>
-                <button onclick="openModal('policyModal')" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Cancel</button>
+                <button data-toast data-toast-title="Attendance confirmed" data-toast-msg="No-show auto-cancel will not apply to this booking." class="rounded-md bg-amber-700 px-3 py-2 text-xs font-semibold text-white">Check In</button>
+                <button data-modal-open="policyModal" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Cancel</button>
               </div>
             </td>
           </tr>
@@ -46,8 +46,8 @@
             <td class="px-4 py-4"><span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Confirmed</span></td>
             <td class="px-4 py-4">
               <div class="flex flex-wrap gap-2">
-                <button onclick="openModal('modifyModal')" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Modify</button>
-                <button onclick="openModal('cancelModal')" class="rounded-md border border-rose-300 px-3 py-2 text-xs font-semibold text-rose-700">Cancel</button>
+                <button data-modal-open="modifyModal" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Modify</button>
+                <button data-modal-open="cancelModal" class="rounded-md border border-rose-300 px-3 py-2 text-xs font-semibold text-rose-700">Cancel</button>
               </div>
             </td>
           </tr>
@@ -56,14 +56,14 @@
             <td class="px-4 py-4">12 Jun 2026, 13:00-16:00</td>
             <td class="px-4 py-4">Guest lecture</td>
             <td class="px-4 py-4"><span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">Pending approval</span></td>
-            <td class="px-4 py-4"><button onclick="showToast('Request viewed', 'Approval request details opened for review.')" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">View</button></td>
+            <td class="px-4 py-4"><button data-toast data-toast-title="Request viewed" data-toast-msg="Approval request details opened for review." class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">View</button></td>
           </tr>
           <tr>
             <td class="px-4 py-4 font-medium">Seminar Room C-101</td>
             <td class="px-4 py-4">01 Jun 2026, 09:00-10:00</td>
             <td class="px-4 py-4">Advising session</td>
             <td class="px-4 py-4"><span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">Auto-cancelled no-show</span></td>
-            <td class="px-4 py-4"><button onclick="showToast('Record opened', 'No-show cancellation reason and timestamp are available in audit history.')" class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Details</button></td>
+            <td class="px-4 py-4"><button data-toast data-toast-title="Record opened" data-toast-msg="No-show cancellation reason and timestamp are available in audit history." class="rounded-md border border-slate-300 px-3 py-2 text-xs font-semibold">Details</button></td>
           </tr>
         </tbody>
       </table>

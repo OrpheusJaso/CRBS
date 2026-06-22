@@ -39,7 +39,7 @@
               <p>Staff and faculty access only. Use your campus account to continue.</p>
             </div>
           </div>
-          <form onsubmit="event.preventDefault(); enterApp();">
+          <form data-action="login">
             <label class="mb-2 block text-sm font-medium" for="email">Email address</label>
             <input id="email" type="email" value="lecturer@mmu.edu.my"
                    class="mb-4 w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100" />
@@ -55,11 +55,11 @@
             <label class="mb-2 block text-sm font-medium" for="password">Password</label>
             <div class="mb-5 flex rounded-md border border-slate-300 bg-white focus-within:border-sky-600 focus-within:ring-2 focus-within:ring-sky-100">
               <input id="password" type="password" value="password123" class="w-full rounded-md px-3 py-2.5 text-sm outline-none" />
-              <button type="button" class="px-3 text-slate-500" title="Show password" onclick="togglePassword()"><i data-lucide="eye" class="h-4 w-4"></i></button>
+              <button type="button" class="px-3 text-slate-500" title="Show password" data-action="toggle-password"><i data-lucide="eye" class="h-4 w-4"></i></button>
             </div>
 
             <div class="mb-5 flex justify-end">
-              <button type="button" onclick="openModal('forgotPasswordModal')" class="text-sm font-semibold text-sky-700 hover:text-sky-900">Forgot password?</button>
+              <button type="button" data-modal-open="forgotPasswordModal" class="text-sm font-semibold text-sky-700 hover:text-sky-900">Forgot password?</button>
             </div>
 
             <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-800">
@@ -88,9 +88,9 @@
     <div class="w-full max-w-md rounded-lg bg-white shadow-xl">
       <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <h3 class="font-semibold">Reset Password</h3>
-        <button onclick="closeModal('forgotPasswordModal')" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+        <button data-modal-close="forgotPasswordModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
       </div>
-      <form class="p-5" onsubmit="event.preventDefault(); sendResetLink();">
+      <form class="p-5" data-action="reset">
         <p class="mb-4 text-sm text-slate-700">Enter your campus email address. The system will send a secure link for resetting your password.</p>
         <label class="block text-sm font-medium">Email address
           <input id="resetEmail" type="email" value="lecturer@mmu.edu.my" required
@@ -100,7 +100,7 @@
           For security, the reset link expires after a limited time and can only be used once.
         </div>
         <div class="mt-5 flex justify-end gap-2">
-          <button type="button" onclick="closeModal('forgotPasswordModal')" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+          <button type="button" data-modal-close="forgotPasswordModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
           <button class="flex items-center gap-2 rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">
             <i data-lucide="mail" class="h-4 w-4"></i> Send Reset Link
           </button>

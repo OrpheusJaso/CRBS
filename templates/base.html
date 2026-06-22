@@ -26,7 +26,7 @@
     <header class="sticky top-0 z-30 border-b border-slate-200 bg-white">
       <div class="flex h-16 items-center justify-between px-4 md:px-6">
         <div class="flex items-center gap-3">
-          <button class="rounded-md border border-slate-200 p-2 text-slate-600 md:hidden" onclick="toggleSidebar()" title="Open menu">
+          <button class="rounded-md border border-slate-200 p-2 text-slate-600 md:hidden" data-action="toggle-sidebar" title="Open menu">
             <i data-lucide="menu" class="h-5 w-5"></i>
           </button>
           <div class="flex h-10 w-10 items-center justify-center rounded-md bg-sky-700 text-white">
@@ -39,7 +39,7 @@
         </div>
         <div class="flex items-center gap-2">
           <button class="relative rounded-md border border-slate-200 p-2 text-slate-600 hover:bg-slate-50" title="Notifications"
-                  onclick="showToast('Notifications', 'You have 2 alerts: maintenance change and check-in reminder.')">
+                  data-toast data-toast-title="Notifications" data-toast-msg="You have 2 alerts: maintenance change and check-in reminder.">
             <i data-lucide="bell" class="h-5 w-5"></i>
             <span class="absolute right-1 top-1 h-2 w-2 rounded-full bg-rose-500"></span>
           </button>
@@ -114,6 +114,7 @@
     };
   </script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages.js') }}"></script>
   {% block page_script %}{% endblock %}
 </body>
 </html>
