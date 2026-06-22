@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard &amp; Alerts{% endblock %}
+{% block active_page %}dashboard{% endblock %}
+
+{% block content %}
+<section id="dashboard">
+  <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h2 id="dashboardTitle" class="text-2xl font-semibold">Dashboard &amp; Alerts</h2>
+      <p id="dashboardSubtitle" class="text-sm text-slate-600">Calendar overview, pending actions, maintenance warnings, and check-in reminders.</p>
+    </div>
+    <button id="dashboardPrimaryBtn" data-action="dashboard-primary" class="flex items-center justify-center gap-2 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-800">
+      <span id="dashboardPrimaryIconWrap"><i data-lucide="plus" class="h-4 w-4"></i></span>
+      <span id="dashboardPrimaryText">New Booking</span>
+    </button>
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-3">
+    <div class="rounded-md border border-slate-200 bg-white p-4">
+      <p id="dashMetric1Label" class="text-sm text-slate-500">Upcoming bookings</p>
+      <p id="dashMetric1Value" class="mt-2 text-3xl font-semibold">0</p>
+    </div>
+    <div id="dashMetric2Card" class="rounded-md border border-amber-200 bg-amber-50 p-4">
+      <p id="dashMetric2Label" class="text-sm text-amber-800">Check-in required</p>
+      <p id="dashMetric2Value" class="mt-2 text-3xl font-semibold text-amber-950">0</p>
+    </div>
+    <div class="rounded-md border border-slate-200 bg-white p-4">
+      <p id="dashMetric3Label" class="text-sm text-slate-500">Approval pending</p>
+      <p id="dashMetric3Value" class="mt-2 text-3xl font-semibold">0</p>
+    </div>
+  </div>
+
+  <div class="mt-5 grid gap-5 xl:grid-cols-[1.35fr_0.65fr]">
+    <div class="rounded-md border border-slate-200 bg-white">
+      <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+        <h3 id="dashboardMainPanelTitle" class="font-semibold">Weekly Calendar</h3>
+        <div class="flex gap-2">
+          <button class="rounded-md border border-slate-200 p-2 text-slate-600" title="Previous week"><i data-lucide="chevron-left" class="h-4 w-4"></i></button>
+          <button class="rounded-md border border-slate-200 p-2 text-slate-600" title="Next week"><i data-lucide="chevron-right" class="h-4 w-4"></i></button>
+        </div>
+      </div>
+      <div id="dashboardMainPanelContent" class="grid grid-cols-1 divide-y divide-slate-200 md:grid-cols-5 md:divide-x md:divide-y-0"></div>
+    </div>
+    <div id="dashboardSidePanel" class="space-y-4"></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_script %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

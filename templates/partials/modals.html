@@ -1,0 +1,139 @@
+<!-- Shared modals. Forms carry IDs so the page scripts can read/submit them
+     (no data-toast here — submit is handled in search.js / bookings.js). -->
+
+<div id="bookingModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Create Single Booking</h3>
+      <button data-modal-close="bookingModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+    </div>
+    <form id="bookingForm" class="p-5">
+      <div class="grid gap-4">
+        <label class="block text-sm font-medium">Resource
+          <input id="bk_resource" readonly class="mt-1 w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm" />
+        </label>
+        <label class="block text-sm font-medium">Purpose
+          <textarea id="bk_purpose" class="mt-1 min-h-20 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">Research group discussion</textarea>
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block text-sm font-medium">Start
+            <input type="datetime-local" id="bk_start" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+          <label class="block text-sm font-medium">End
+            <input type="datetime-local" id="bk_end" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+        </div>
+        <label class="block text-sm font-medium">Attendees
+          <input type="number" id="bk_capacity" value="10" min="1" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" data-modal-close="bookingModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+        <button type="submit" class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Confirm Booking</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="recurringModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Create Recurring Booking</h3>
+      <button data-modal-close="recurringModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+    </div>
+    <form id="recurringForm" class="p-5">
+      <div class="grid gap-4">
+        <label class="block text-sm font-medium">Resource
+          <input id="rc_resource" readonly class="mt-1 w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm" />
+        </label>
+        <label class="block text-sm font-medium">Repeats
+          <select id="rc_pattern" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block text-sm font-medium">First start
+            <input type="datetime-local" id="rc_start" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+          <label class="block text-sm font-medium">First end
+            <input type="datetime-local" id="rc_end" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+        </div>
+        <label class="block text-sm font-medium">Repeat until
+          <input type="date" id="rc_until" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+        <label class="block text-sm font-medium">Purpose
+          <textarea id="rc_purpose" class="mt-1 min-h-16 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">Weekly tutorial class</textarea>
+        </label>
+        <div class="rounded-md border border-sky-200 bg-sky-50 p-3 text-sm text-sky-950">
+          Conflict checking runs across all generated dates before any are saved.
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" data-modal-close="recurringModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+        <button type="submit" class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Create Series</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="modifyModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Modify Booking</h3>
+      <button data-modal-close="modifyModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+    </div>
+    <form id="modifyForm" class="p-5">
+      <input type="hidden" id="md_id" />
+      <p id="md_resource" class="mb-4 text-sm font-medium text-slate-700"></p>
+      <div class="grid gap-4 md:grid-cols-2">
+        <label class="block text-sm font-medium">Start
+          <input type="datetime-local" id="md_start" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+        <label class="block text-sm font-medium">End
+          <input type="datetime-local" id="md_end" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" data-modal-close="modifyModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+        <button type="submit" class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="cancelModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-md rounded-lg bg-white shadow-xl">
+    <div class="border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Cancel Booking</h3>
+    </div>
+    <div class="p-5">
+      <input type="hidden" id="cancel_id" />
+      <p class="text-sm text-slate-700">Are you sure you want to cancel this booking? The resource will be released for other users.</p>
+      <div class="mt-5 flex justify-end gap-2">
+        <button data-modal-close="cancelModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Keep Booking</button>
+        <button id="cancelConfirmBtn" type="button" class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Cancel Booking</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Approvals page (queue review is out of scope; kept as a static demo). -->
+<div id="rejectModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-md rounded-lg bg-white shadow-xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Reject Approval Request</h3>
+      <button data-modal-close="rejectModal" title="Close"><i data-lucide="x" class="h-5 w-5"></i></button>
+    </div>
+    <div class="p-5">
+      <label class="block text-sm font-medium">Reason for rejection
+        <textarea class="mt-2 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">Resource is unavailable due to maintenance.</textarea>
+      </label>
+      <div class="mt-5 flex justify-end gap-2">
+        <button data-modal-close="rejectModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
+        <button data-modal-close="rejectModal" data-toast data-toast-title="Request rejected" data-toast-msg="Requester has been notified with the rejection reason." class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Reject Request</button>
+      </div>
+    </div>
+  </div>
+</div>

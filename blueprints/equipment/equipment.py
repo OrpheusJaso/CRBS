@@ -1,79 +1,65 @@
-from extensions import *
-from models import User
+from extensions import (
+    Blueprint, request, jsonify, abort, db, login_required, role_required,
+    current_user_id,
+)
+from models import Equipment, EquipmentRequest
+from datetime import datetime
 
 equipmentBp = Blueprint("equipment", __name__, url_prefix="/api/equipment")
 
-class equipment(db.Model):
-    equipmentId = db.Column("equipmentId", db.Integer(11), primary_key = True, nullable = False)
-    resourceId = db.Column("resourceId", db.Integer(11), foreign_key = True, nullable = False)
-    name = db.Column("name", db.String(100), nullable = False)
-    type = db.Column("type", db.String(50), nullable = False)
-    quantity = db.Column("quantity", db.Integer(11), nullable = False)
-    isSpecialised = db.Column("isSpecialised", db.Boolean, nullable = False)
-    condition = db.Column("condition", db.String(50), nullable = False)
-    
-    def __init__(self, equipmentId, name, type, quantity, location, condition, description, isSpecialised):
-        self.__equipmentId = equipmentId
-        self.__name = name
-        self.__type = type
-        self.__quantity = quantity
-        self.__condition = condition
-        self.__description = description
-        self.__isSpecialised = isSpecialised
-        
-# Getters
-    def getEquipmentId(self):
-        return self.__equipmentId
-    
-    def getEquipmentName(self):
-        return self.__name
-    
-    def getEquipmentType(self):
-        return self.__type
-    
-    def getEquipmentQuantity(self):
-        return self.__quantity
-    
-    def getEquipmentCondition(self):
-        return self.__condition
-    
-    def getEquipmentDescription(self):
-        return self.__description
-    
-    def getEquipmentIsSpecialised(self):
-        return self.__isSpecialised
-
-# Setters        
-    def setEquipmentId(self, equipmentId):
-        self.__equipmentId = equipmentId
-    
-    def setEquipmentName(self, name):
-        self.__name = name
-    
-    def setEquipmentType(self, type):
-        self.__type = type
-    
-    def setEquipmentQuantity(self, quantity):
-        self.__quantity = quantity
-    
-    def setEquipmentCondition(self, condition):
-        self.__condition = condition
-    
-    def setEquipmentDescription(self, description):
-        self.__description = description
-    
-    def setEquipmentIsSpecialised(self, isSpecialised):
-        self.__isSpecialised = isSpecialised
+# Specialised equipment requests come from staff (and admins acting as staff).
+REQUESTERS = ("staff", "admin")
 
 
-@equipmentBp.route("/register")
-def Equipment():
-    
-    # placeholder implementation (simple JSON-compatible return)
-    return {"model": "User"}
+@equipmentBp.get("")
+@login_required
+def list_equipment():
+    """Catalogue of equipment (drop-down options for the request form)."""
+    return jsonify(equipment=[e.to_dict() for e in Equipment.query.all()])
 
-@equipmentBp.route("/login")
-def login():
-    
-    # placeholder implementation (simple JSON-compatible return)
-    return {"model": "User"}
+
+@equipmentBp.post("/request")
+@role_required(*REQUESTERS)
+def submit_request():
+    """Submit a specialised equipment request (Equipment Request form)."""
+    data = request.get_json(silent=True) or {}
+    name = (data.get("equipmentName") or "").strip()
+    if not name:
+        abort(400, description="'equipmentName' is required.")
+
+    requested_date = None
+    if data.get("requestedDate"):
+        try:
+            requested_date = datetime.fromisoformat(data["requestedDate"])
+        except ValueError:
+            abort(400, description="Invalid 'requestedDate'.")
+
+    req = EquipmentRequest(
+        userId=current_user_id(),
+        equipmentName=name,
+        purpose=data.get("purpose"),
+        requestedDate=requested_date,
+        attendees=data.get("attendees"),
+        status="pending",
+    )
+    db.session.add(req)
+
+    # Notify the requester that the approval workflow has started.
+    from blueprints.booking.services import notify
+    notify(current_user_id(), "Request submitted",
+           f"Your request for {name} is pending manager approval.",
+           type="approval")
+    db.session.commit()
+    return jsonify(request=req.to_dict()), 201
+
+
+@equipmentBp.get("/request")
+@login_required
+def my_requests():
+    """List the current user's equipment requests."""
+    rows = (
+        EquipmentRequest.query.filter_by(userId=current_user_id())
+        .order_by(EquipmentRequest.created_at.desc())
+        .all()
+    )
+    return jsonify(requests=[r.to_dict() for r in rows])
