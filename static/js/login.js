@@ -1,9 +1,6 @@
-/* Login page behaviour (standalone — does not load app.js/pages.js).
- * Wired through data-* attributes so login.html stays markup-only.
- * window.CRBS.urls.dashboard is injected by the template. */
+/* Login page: real authentication against POST /api/user/login.
+ * Standalone — loads api.js but not app.js. Driven by data-* attributes. */
 (function () {
-  var CRBS = window.CRBS || { urls: {} };
-
   function byId(id) { return document.getElementById(id); }
   function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
 
@@ -22,13 +19,21 @@
     window.clearTimeout(window.toastTimer);
     window.toastTimer = window.setTimeout(function () {
       toast.classList.add("hidden");
-    }, 3200);
+    }, 3600);
     refreshIcons();
   }
 
-  function signIn() {
-    localStorage.setItem("crbsRole", byId("loginRole").value);
-    window.location.href = CRBS.urls.dashboard;
+  async function signIn() {
+    try {
+      var data = await api.post("/api/user/login", {
+        email: byId("email").value.trim(),
+        password: byId("password").value
+      });
+      localStorage.setItem("crbsRole", data.user.role);   // cache for nav
+      window.location.href = window.CRBS.urls.dashboard;
+    } catch (err) {
+      showToast("Sign in failed", err.message);
+    }
   }
 
   function sendResetLink() {

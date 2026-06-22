@@ -20,6 +20,8 @@
     var action = el.getAttribute("data-action");
     if (action === "logout") logout();
     else if (action === "toggle-sidebar") toggleSidebar();
+    else if (action === "notifications") toggleNotifications();
+    else if (action === "mark-read") markAllRead();
     else if (action === "dashboard-primary" && window.handleDashboardPrimaryAction) {
       handleDashboardPrimaryAction();
     }

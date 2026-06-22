@@ -10,30 +10,29 @@
   </div>
 
   <div class="grid gap-5 xl:grid-cols-[1fr_0.75fr]">
-    <form class="rounded-md border border-slate-200 bg-white p-4"
-          data-toast data-toast-title="Profile updated" data-toast-msg="Your staff profile and contact details were saved.">
+    <form id="profileForm" class="rounded-md border border-slate-200 bg-white p-4">
       <div class="grid gap-4 md:grid-cols-2">
         <label class="block text-sm font-medium">Full name
-          <input value="Dr. Aisyah Rahman" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          <input id="pf_name" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
         </label>
         <label class="block text-sm font-medium">Department
           <input value="Faculty of Computing and Informatics" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
         </label>
         <label class="block text-sm font-medium">Email
-          <input value="lecturer@mmu.edu.my" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          <input id="pf_email" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
         </label>
-        <label class="block text-sm font-medium">Phone
-          <input value="+60 12-345 6789" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        <label class="block text-sm font-medium">Role
+          <input id="pf_role" readonly class="mt-2 w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm" />
         </label>
       </div>
       <div class="mt-5 border-t border-slate-200 pt-5">
         <h3 class="mb-3 font-semibold">Change Password</h3>
         <div class="grid gap-4 md:grid-cols-2">
-          <input type="password" placeholder="New password" class="rounded-md border border-slate-300 px-3 py-2 text-sm" />
-          <input type="password" placeholder="Confirm password" class="rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          <input type="password" id="pf_password" placeholder="New password" class="rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          <input type="password" id="pf_password2" placeholder="Confirm password" class="rounded-md border border-slate-300 px-3 py-2 text-sm" />
         </div>
       </div>
-      <button class="mt-5 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white">Save Profile</button>
+      <button type="submit" class="mt-5 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white">Save Profile</button>
     </form>
 
     <div class="space-y-5">
@@ -64,4 +63,8 @@
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block page_script %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
 {% endblock %}

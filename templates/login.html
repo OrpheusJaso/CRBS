@@ -44,14 +44,6 @@
             <input id="email" type="email" value="lecturer@mmu.edu.my"
                    class="mb-4 w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100" />
 
-            <label class="mb-2 block text-sm font-medium" for="loginRole">Demo access role</label>
-            <select id="loginRole" class="mb-4 w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-sky-600 focus:ring-2 focus:ring-sky-100">
-              <option value="staff">Staff / Faculty</option>
-              <option value="student">Student</option>
-              <option value="manager">Resource Manager</option>
-              <option value="admin">Admin</option>
-            </select>
-
             <label class="mb-2 block text-sm font-medium" for="password">Password</label>
             <div class="mb-5 flex rounded-md border border-slate-300 bg-white focus-within:border-sky-600 focus-within:ring-2 focus-within:ring-sky-100">
               <input id="password" type="password" value="password123" class="w-full rounded-md px-3 py-2.5 text-sm outline-none" />
@@ -66,6 +58,15 @@
               <i data-lucide="log-in" class="h-4 w-4"></i> Sign in
             </button>
           </form>
+
+          <p class="mt-5 text-center text-sm text-slate-600">
+            No account?
+            <a href="{{ url_for('views.signup') }}" class="font-semibold text-sky-700 hover:text-sky-900">Create a test account</a>
+          </p>
+          <div class="mt-4 rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
+            <p class="mb-1 font-semibold text-slate-700">Demo accounts (password <code>password123</code>):</p>
+            <p>student@ &middot; lecturer@ &middot; manager@ &middot; admin@mmu.edu.my</p>
+          </div>
         </div>
       </div>
 
@@ -110,9 +111,15 @@
   </div>
 
   <script>
-    // Inject the dashboard URL for the external login script.
-    window.CRBS = { urls: { dashboard: "{{ url_for('views.dashboard') }}" } };
+    window.CRBS = {
+      urls: {
+        login: "{{ url_for('views.login') }}",
+        dashboard: "{{ url_for('views.dashboard') }}"
+      }
+    };
+    window.CRBS_NO_AUTH_REDIRECT = true; // public page: don't bounce on 401
   </script>
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>
   <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 </body>
 </html>

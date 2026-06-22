@@ -3,6 +3,7 @@ from extensions import (
     current_user_id, current_role, ALL_ROLES,
 )
 from models import User
+import uuid
 
 userBp = Blueprint("user", __name__, url_prefix="/api/user")
 
@@ -26,25 +27,33 @@ def login():
 
 @userBp.post("/register")
 def register():
-    """Create a new account."""
+    """Create a new account and start a session (used by the signup page)."""
     data = request.get_json(silent=True) or {}
-    for field in ("userId", "name", "email", "password"):
+    for field in ("name", "email", "password"):
         if not data.get(field):
             abort(400, description=f"'{field}' is required.")
 
     role = data.get("role", "student")
     if role not in ALL_ROLES:
         abort(400, description="Invalid role.")
-    if User.query.get(data["userId"]) or User.query.filter(
-        db.func.lower(User.email) == data["email"].lower()
-    ).first():
-        abort(409, description="User already exists.")
 
-    user = User(userId=data["userId"], name=data["name"],
-                email=data["email"], role=role)
+    # userId is optional from the client; generate one if absent.
+    user_id = data.get("userId") or f"u-{uuid.uuid4().hex[:10]}"
+    if User.query.get(user_id):
+        abort(409, description="User ID already exists.")
+    if User.query.filter(db.func.lower(User.email) == data["email"].strip().lower()).first():
+        abort(409, description="An account with that email already exists.")
+
+    user = User(userId=user_id, name=data["name"],
+                email=data["email"].strip(), role=role)
     user.set_password(data["password"])
     db.session.add(user)
     db.session.commit()
+
+    # Log the new user straight in so they land in the app.
+    session.permanent = True
+    session["userId"] = user.userId
+    session["role"] = user.role
     return jsonify(user=user.to_dict()), 201
 
 

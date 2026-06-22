@@ -9,6 +9,11 @@ def login():
     return render_template("login.html")
 
 
+@viewsBp.get("/signup")
+def signup():
+    return render_template("signup.html")
+
+
 @viewsBp.get("/dashboard")
 def dashboard():
     return render_template("dashboard.html")

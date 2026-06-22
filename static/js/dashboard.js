@@ -1,150 +1,52 @@
-/* Dashboard page: role-aware metrics, calendar and side cards.
- * Loads after app.js, so byId/setText/currentRole/refreshIcons are available.
- * Route URLs come from window.CRBS.urls (injected by the template). */
+/* Dashboard: real metrics + upcoming bookings from GET /api/dashboard.
+ * Loads after app.js (byId/setText/currentRole/refreshIcons + CRBS.urls). */
 (function () {
   var urls = (window.CRBS || { urls: {} }).urls;
 
-  function calendarHtml(events) {
-    return events.map(function (event) {
-      return '<div class="calendar-cell p-3">' +
-        '<p class="mb-3 text-sm font-semibold">' + event.day + '</p>' +
-        '<div class="rounded-md ' + event.className + ' p-2 text-xs">' +
-        event.title + '<br />' + event.detail + '</div></div>';
-    }).join("");
-  }
-
-  var toneClasses = {
-    amber: "border-amber-200 bg-amber-50 text-amber-950",
-    emerald: "border-emerald-200 bg-emerald-50 text-emerald-950",
-    rose: "border-rose-200 bg-rose-50 text-rose-900",
-    sky: "border-sky-200 bg-sky-50 text-sky-950",
-    slate: "border-slate-200 bg-white text-slate-900"
+  var profiles = {
+    student: { title: "Student Booking Dashboard",
+      subtitle: "Track your bookings, check-in reminders, and policy alerts.",
+      primaryText: "Find Resource", primaryIcon: "search", primaryTarget: urls.search },
+    staff: { title: "Staff/Faculty Dashboard",
+      subtitle: "Monitor bookings, recurring sessions, and equipment requests.",
+      primaryText: "New Booking", primaryIcon: "plus", primaryTarget: urls.search },
+    manager: { title: "Resource Manager Dashboard",
+      subtitle: "Pending approvals, resource availability and maintenance.",
+      primaryText: "Review Approvals", primaryIcon: "clipboard-check", primaryTarget: urls.approvals },
+    admin: { title: "Admin Control Dashboard",
+      subtitle: "System approval workload and resource health.",
+      primaryText: "Manage Approvals", primaryIcon: "shield-check", primaryTarget: urls.approvals }
   };
 
-  function sideCardsHtml(cards) {
-    return cards.map(function (card) {
-      var button = card.buttonText
-        ? '<button onclick="' + card.action + '" class="rounded-md ' + card.buttonClass +
-          ' px-3 py-2 text-sm font-semibold">' + card.buttonText + "</button>"
-        : "";
-      return '<div class="rounded-md border ' + toneClasses[card.tone] + ' p-4">' +
-        '<div class="mb-2 flex items-center gap-2 font-semibold"><i data-lucide="' +
-        card.icon + '" class="h-4 w-4"></i> ' + card.title + "</div>" +
-        '<p class="' + (button ? "mb-3 " : "") + 'text-sm">' + card.text + "</p>" +
-        button + "</div>";
-    }).join("");
+  function fmt(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    return d.toLocaleString([], { day: "2-digit", month: "short",
+      hour: "2-digit", minute: "2-digit" });
   }
 
-  function queueHtml(rows) {
-    var body = rows.map(function (row) {
-      return '<tr><td class="px-4 py-3">' + row.request + "</td>" +
-        '<td class="px-4 py-3">' + row.status + "</td>" +
-        '<td class="px-4 py-3"><span class="rounded-full ' + row.badgeClass +
-        ' px-2 py-1 text-xs font-semibold">' + row.priority + "</span></td></tr>";
-    }).join("");
-    return '<div class="p-4"><div class="overflow-hidden rounded-md border border-slate-200">' +
-      '<table class="w-full text-left text-sm"><thead class="bg-slate-50 text-slate-600">' +
-      '<tr><th class="px-4 py-3 font-semibold">Request</th><th class="px-4 py-3 font-semibold">Status</th><th class="px-4 py-3 font-semibold">Priority</th></tr>' +
-      '</thead><tbody class="divide-y divide-slate-200">' + body + "</tbody></table></div></div>";
-  }
+  var statusTone = {
+    confirmed: "bg-emerald-50 text-emerald-800",
+    checked_in: "bg-sky-50 text-sky-800",
+    pending: "bg-amber-50 text-amber-800",
+    cancelled: "bg-rose-50 text-rose-700",
+    no_show: "bg-rose-50 text-rose-700"
+  };
 
-  function overviewGridHtml(items) {
-    return '<div class="grid gap-4 p-4 md:grid-cols-2">' + items.map(function (item) {
-      return '<div class="rounded-md border border-slate-200 p-4">' +
-        '<p class="text-sm text-slate-500">' + item.label + "</p>" +
-        '<p class="mt-2 ' + item.valueClass + '">' + item.value + "</p></div>";
-    }).join("") + "</div>";
-  }
-
-  var dashboardProfiles = {
-    student: {
-      title: "Student Booking Dashboard",
-      subtitle: "Track personal room bookings, check-in reminders, and booking policy alerts.",
-      primaryText: "Find Resource", primaryIcon: "search", primaryTarget: urls.search,
-      metrics: [["My upcoming bookings", "2"], ["Check-in required", "1"], ["Cancelled bookings", "0"]],
-      panelTitle: "My Weekly Booking Calendar",
-      mainHtml: calendarHtml([
-        { day: "Mon", className: "bg-sky-50 text-sky-950", title: "11:00 Study Room S-02", detail: "Group assignment" },
-        { day: "Tue", className: "bg-amber-50 text-amber-950", title: "14:00 Lab A-203", detail: "Check-in opens 13:45" },
-        { day: "Wed", className: "bg-slate-100 text-slate-700", title: "No bookings", detail: "&nbsp;" },
-        { day: "Thu", className: "bg-slate-100 text-slate-700", title: "No bookings", detail: "&nbsp;" },
-        { day: "Fri", className: "bg-emerald-50 text-emerald-950", title: "16:00 Meeting Pod", detail: "Confirmed" }
-      ]),
-      sideHtml: sideCardsHtml([
-        { tone: "amber", icon: "badge-check", title: "Student Check-In", text: "Lab A-203 starts today at 14:00. Confirm attendance to avoid auto-cancel.", buttonText: "Confirm Attendance", buttonClass: "bg-amber-700 text-white hover:bg-amber-800", action: "showToast('Attendance confirmed', 'Your student booking will not be auto-cancelled.')" },
-        { tone: "slate", icon: "info", title: "Booking Rule", text: "Students can book shared study spaces and selected labs according to campus policy." }
-      ])
-    },
-    staff: {
-      title: "Staff/Faculty Dashboard",
-      subtitle: "Monitor teaching bookings, recurring sessions, equipment requests, and maintenance alerts.",
-      primaryText: "New Booking", primaryIcon: "plus", primaryTarget: urls.search,
-      metrics: [["Upcoming bookings", "4"], ["Check-in required", "1"], ["Approval pending", "2"]],
-      panelTitle: "Teaching & Meeting Calendar",
-      mainHtml: calendarHtml([
-        { day: "Mon", className: "bg-sky-50 text-sky-950", title: "10:00 Lab A-203", detail: "Software Engineering Tutorial" },
-        { day: "Tue", className: "bg-amber-50 text-amber-950", title: "14:00 Meeting Room B", detail: "Check-in opens 13:45" },
-        { day: "Wed", className: "bg-slate-100 text-slate-700", title: "No bookings", detail: "&nbsp;" },
-        { day: "Thu", className: "bg-emerald-50 text-emerald-950", title: "09:00 Seminar Room", detail: "Recurring weekly" },
-        { day: "Fri", className: "bg-rose-50 text-rose-950", title: "Projector P-04", detail: "Maintenance conflict" }
-      ]),
-      sideHtml: sideCardsHtml([
-        { tone: "amber", icon: "badge-check", title: "Check-In Required", text: "Meeting Room B starts today at 14:00. Confirm attendance to avoid auto-cancel.", buttonText: "Confirm Attendance", buttonClass: "bg-amber-700 text-white hover:bg-amber-800", action: "showToast('Attendance confirmed', 'Your booking will not be auto-cancelled as a no-show.')" },
-        { tone: "rose", icon: "wrench", title: "Maintenance Alert", text: "Projector P-04 is unavailable Friday 13:00-17:00. Affected bookings will receive email alerts." },
-        { tone: "slate", icon: "refresh-cw", title: "Auto-Cancel Status", text: "No-show detection runs 15 minutes after the start time if no check-in is recorded." }
-      ])
-    },
-    manager: {
-      title: "Resource Manager Dashboard",
-      subtitle: "Focus on pending approvals, resource availability, maintenance conflicts, and operational follow-up.",
-      primaryText: "Review Approvals", primaryIcon: "clipboard-check", primaryTarget: urls.approvals,
-      metrics: [["Pending approvals", "5"], ["Maintenance conflicts", "2"], ["Resources unavailable", "3"]],
-      panelTitle: "Approval & Resource Queue",
-      mainHtml: queueHtml([
-        { request: "Projector P-04 for guest lecture", status: "Pending review", priority: "Medium", badgeClass: "bg-amber-50 text-amber-800" },
-        { request: "Seminar Room capacity conflict", status: "Needs alternative", priority: "High", badgeClass: "bg-rose-50 text-rose-700" },
-        { request: "Wireless mic set", status: "Ready to approve", priority: "Low", badgeClass: "bg-emerald-50 text-emerald-700" }
-      ]),
-      sideHtml: sideCardsHtml([
-        { tone: "rose", icon: "wrench", title: "Maintenance Action", text: "Projector P-04 requires status update before approving related requests." },
-        { tone: "slate", icon: "clipboard-check", title: "Approval Reminder", text: "Review specialized equipment requests before the requested booking date.", buttonText: "Open Approvals", buttonClass: "bg-sky-700 text-white", action: "window.location.href='" + urls.approvals + "'" }
-      ])
-    },
-    admin: {
-      title: "Admin Control Dashboard",
-      subtitle: "View system-wide approval workload, resource health, usage risk, and administrative actions.",
-      primaryText: "Manage Approvals", primaryIcon: "shield-check", primaryTarget: urls.approvals,
-      metrics: [["System approvals", "12"], ["Policy exceptions", "3"], ["Resource issues", "4"]],
-      panelTitle: "System Operations Overview",
-      mainHtml: overviewGridHtml([
-        { label: "Today usage rate", value: "78%", valueClass: "text-2xl font-semibold" },
-        { label: "No-show rate", value: "6%", valueClass: "text-2xl font-semibold" },
-        { label: "Most requested resource", value: "Computer Lab A-203", valueClass: "font-semibold" },
-        { label: "Departments active", value: "9", valueClass: "text-2xl font-semibold" }
-      ]),
-      sideHtml: sideCardsHtml([
-        { tone: "amber", icon: "shield-alert", title: "Admin Priority", text: "Three policy exception requests need admin decision before confirmation." },
-        { tone: "slate", icon: "bar-chart-3", title: "Reporting Focus", text: "Use approval and utilization reports to monitor compliance and resource demand.", buttonText: "Generate Report", buttonClass: "bg-sky-700 text-white", action: "showToast('Admin report generated', 'System usage summary is ready for review.')" }
-      ])
+  function upcomingHtml(rows) {
+    if (!rows.length) {
+      return '<p class="p-6 text-sm text-slate-500">No upcoming bookings.</p>';
     }
-  };
-
-  function applyDashboardContent() {
-    var dashboard = dashboardProfiles[currentRole()] || dashboardProfiles.staff;
-    setText("dashboardTitle", dashboard.title);
-    setText("dashboardSubtitle", dashboard.subtitle);
-    setText("dashboardPrimaryText", dashboard.primaryText);
-    setText("dashboardMainPanelTitle", dashboard.panelTitle);
-    dashboard.metrics.forEach(function (metric, index) {
-      setText("dashMetric" + (index + 1) + "Label", metric[0]);
-      setText("dashMetric" + (index + 1) + "Value", metric[1]);
-    });
-    byId("dashboardPrimaryBtn").dataset.target = dashboard.primaryTarget;
-    byId("dashboardPrimaryIconWrap").innerHTML =
-      '<i data-lucide="' + dashboard.primaryIcon + '" class="h-4 w-4"></i>';
-    byId("dashboardMainPanelContent").innerHTML = dashboard.mainHtml;
-    byId("dashboardSidePanel").innerHTML = dashboard.sideHtml;
-    refreshIcons();
+    var body = rows.map(function (b) {
+      var tone = statusTone[b.status] || "bg-slate-100 text-slate-700";
+      return '<div class="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3">' +
+        '<div><p class="text-sm font-semibold text-slate-800">' + (b.resourceName || "Resource") + '</p>' +
+        '<p class="text-xs text-slate-500">' + fmt(b.startTime) + " – " + fmt(b.endTime) +
+        (b.purpose ? " · " + b.purpose : "") + '</p></div>' +
+        '<span class="rounded-full ' + tone + ' px-2.5 py-1 text-xs font-semibold">' +
+        b.status.replace("_", " ") + '</span></div>';
+    }).join("");
+    return body;
   }
 
   window.handleDashboardPrimaryAction = function () {
@@ -152,5 +54,32 @@
     if (target) window.location.href = target;
   };
 
-  document.addEventListener("DOMContentLoaded", applyDashboardContent);
+  async function load() {
+    var role = currentRole();
+    var p = profiles[role] || profiles.staff;
+    setText("dashboardTitle", p.title);
+    setText("dashboardSubtitle", p.subtitle);
+    setText("dashboardPrimaryText", p.primaryText);
+    setText("dashboardMainPanelTitle", "Upcoming Bookings");
+    byId("dashboardPrimaryBtn").dataset.target = p.primaryTarget;
+    byId("dashboardPrimaryIconWrap").innerHTML =
+      '<i data-lucide="' + p.primaryIcon + '" class="h-4 w-4"></i>';
+
+    try {
+      var data = await api.get("/api/dashboard");
+      (data.metrics || []).forEach(function (m, i) {
+        setText("dashMetric" + (i + 1) + "Label", m.label);
+        setText("dashMetric" + (i + 1) + "Value", m.value);
+      });
+      byId("dashboardMainPanelContent").className = "";
+      byId("dashboardMainPanelContent").innerHTML = upcomingHtml(data.upcoming || []);
+      byId("dashboardSidePanel").innerHTML =
+        '<div class="rounded-md border border-slate-200 bg-white p-4">' +
+        '<div class="mb-2 flex items-center gap-2 font-semibold"><i data-lucide="info" class="h-4 w-4"></i> Policy</div>' +
+        '<p class="text-sm text-slate-600">Bookings cannot be modified or cancelled within 24 hours of the start time. Check in to avoid no-show auto-cancel.</p></div>';
+      refreshIcons();
+    } catch (e) { /* 401 handled by api.js */ }
+  }
+
+  document.addEventListener("DOMContentLoaded", load);
 })();
