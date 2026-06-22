@@ -6,11 +6,7 @@
   <title>MMU Campus Resource Booking - Sign in</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    .modal { display: none; }
-    .modal.active { display: flex; }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
 </head>
 <body class="bg-slate-100 text-slate-900">
 
@@ -114,44 +110,9 @@
   </div>
 
   <script>
-    function byId(id) { return document.getElementById(id); }
-    function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
-
-    function enterApp() {
-      var role = byId('loginRole').value;
-      localStorage.setItem('crbsRole', role);
-      window.location.href = "{{ url_for('views.dashboard') }}";
-    }
-
-    function togglePassword() {
-      var input = byId('password');
-      input.type = input.type === 'password' ? 'text' : 'password';
-    }
-
-    function openModal(id) {
-      if (id === 'forgotPasswordModal') byId('resetEmail').value = byId('email').value;
-      byId(id).classList.add('active');
-      refreshIcons();
-    }
-    function closeModal(id) { byId(id).classList.remove('active'); }
-
-    function sendResetLink() {
-      var email = byId('resetEmail').value;
-      closeModal('forgotPasswordModal');
-      showToast('Reset link sent', 'A password reset link has been sent to ' + email + '.');
-    }
-
-    function showToast(title, message) {
-      var toast = byId('toast');
-      byId('toastTitle').textContent = title;
-      byId('toastMessage').textContent = message;
-      toast.classList.remove('hidden');
-      window.clearTimeout(window.toastTimer);
-      window.toastTimer = window.setTimeout(function () { toast.classList.add('hidden'); }, 3200);
-      refreshIcons();
-    }
-
-    document.addEventListener('DOMContentLoaded', refreshIcons);
+    // Inject the dashboard URL for the external login script.
+    window.CRBS = { urls: { dashboard: "{{ url_for('views.dashboard') }}" } };
   </script>
+  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 </body>
 </html>

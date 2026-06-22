@@ -6,13 +6,7 @@
   <title>{% block title %}Campus Resource Booking{% endblock %} - MMU</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    .nav-btn.active { background: #e0f2fe; color: #075985; border-color: #7dd3fc; }
-    .modal { display: none; }
-    .modal.active { display: flex; }
-    .calendar-cell { min-height: 104px; }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
 </head>
 <body class="bg-slate-100 text-slate-900">
 
@@ -105,65 +99,21 @@
   {% include 'partials/modals.html' %}
 
   <script>
-    var activePage = "{% block active_page %}dashboard{% endblock %}";
-
-    function byId(id) { return document.getElementById(id); }
-    function setText(id, value) { var el = byId(id); if (el) el.textContent = value; }
-
-    var roleProfiles = {
-      student: { label: 'Student', userName: 'Nur Iman' },
-      staff:   { label: 'Staff / Faculty', userName: 'Dr. Aisyah' },
-      manager: { label: 'Resource Manager', userName: 'Mr. Daniel' },
-      admin:   { label: 'Admin', userName: 'Admin User' }
+    // Inject Flask route URLs + the active page for the external scripts.
+    window.CRBS = {
+      activePage: "{% block active_page %}dashboard{% endblock %}",
+      urls: {
+        login: "{{ url_for('views.login') }}",
+        dashboard: "{{ url_for('views.dashboard') }}",
+        search: "{{ url_for('views.search') }}",
+        bookings: "{{ url_for('views.bookings') }}",
+        equipment: "{{ url_for('views.equipment') }}",
+        approvals: "{{ url_for('views.approvals') }}",
+        profile: "{{ url_for('views.profile') }}"
+      }
     };
-
-    function currentRole() {
-      return localStorage.getItem('crbsRole') || 'staff';
-    }
-
-    function applyRoleAccess() {
-      var role = currentRole();
-      var profile = roleProfiles[role] || roleProfiles.staff;
-      setText('headerUserName', profile.userName);
-      setText('headerRoleBadge', profile.label);
-      setText('headerContextLabel', 'MMU ' + profile.label + ' Portal');
-
-      document.querySelectorAll('.nav-btn').forEach(function (btn) {
-        var roles = (btn.dataset.roles || '').split(',');
-        btn.classList.toggle('hidden', roles.indexOf(role) === -1);
-        btn.classList.toggle('active', btn.dataset.page === activePage);
-      });
-    }
-
-    function toggleSidebar() { byId('sidebar').classList.toggle('hidden'); }
-
-    function logout() {
-      localStorage.removeItem('crbsRole');
-      window.location.href = "{{ url_for('views.login') }}";
-    }
-
-    function openModal(id) { byId(id).classList.add('active'); refreshIcons(); }
-    function closeModal(id) { byId(id).classList.remove('active'); }
-
-    function showToast(title, message) {
-      var toast = byId('toast');
-      setText('toastTitle', title);
-      setText('toastMessage', message);
-      toast.classList.remove('hidden');
-      window.clearTimeout(window.toastTimer);
-      window.toastTimer = window.setTimeout(function () {
-        toast.classList.add('hidden');
-      }, 3200);
-      refreshIcons();
-    }
-
-    function refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      applyRoleAccess();
-      refreshIcons();
-    });
   </script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   {% block page_script %}{% endblock %}
 </body>
 </html>
