@@ -1,16 +1,21 @@
 from extensions import Flask
 
-# For the modules of the system (Blueprint contains the module functions) 
+# Each module's routes live in its own blueprint and are wired up here.
+
 
 def register_blueprints(app: Flask) -> None:
-    
     from .user.user import userBp
     from .userProfile.userProfile import userProfileBp
+    from .resource.resource import resourceBp
+    from .booking.booking import bookingBp
+    from .notification.notification import notificationBp
 
-    
     blueprints = [
         userBp,
         userProfileBp,
+        resourceBp,
+        bookingBp,
+        notificationBp,
     ]
 
     for bp in blueprints:
