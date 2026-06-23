@@ -78,6 +78,10 @@
              class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
             <i data-lucide="calendar-days" class="h-4 w-4"></i> Manage Bookings
           </a>
+          <a href="{{ url_for('views.resource') }}" data-page="resource" data-roles="manager, admin"
+             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
+            <i data-lucide="wrench" class="h-4 w-4"></i> Manage Resource
+          </a>
           <a href="{{ url_for('views.equipment') }}" data-page="equipment" data-roles="staff,manager,admin"
              class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
             <i data-lucide="projector" class="h-4 w-4"></i> Specialized Equipment
