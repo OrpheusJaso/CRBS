@@ -1,5 +1,5 @@
 <!-- Shared modals. Forms carry IDs so the page scripts can read/submit them
-     (no data-toast here — submit is handled in search.js / bookings.js). -->
+     (no data-toast here — submit is handled in search.js / bookings.js / resource.js / equipment_manage.js). -->
 
 <div id="bookingModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4">
   <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
@@ -119,6 +119,7 @@
   </div>
 </div>
 
+<!-- Resource page (Create, Modify, Delete) -->
 <div id="createResourceModal" class="modal fixed inset-0 z-40 hidden items-center justify-center bg-slate-950/50 p-4">
   <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
     <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
@@ -158,7 +159,7 @@
         </label>
         <label class="flex items-center gap-2 text-sm font-medium">
           <input type="checkbox" id="r_specialised" class="h-4 w-4" />
-          Requires Approval
+          Is Specialized (Requires Approval)
         </label>
         <label class="block text-sm font-medium">Description
           <textarea id="r_description"
@@ -256,6 +257,137 @@
       <div class="mt-5 flex justify-end gap-2">
         <button data-modal-close="deleteResourceModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Cancel</button>
         <button id="deleteConfirmBtn" type="button" class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Delete Resource</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="createEquipmentModal" class="modal fixed inset-0 z-40 hidden items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Create Equipment</h3>
+      <button data-modal-close="createEquipmentModal" title="Close">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+    </div>
+    <form id="createEquipmentForm" class="p-5">
+      <div class="grid gap-4">
+        <label class="block text-sm font-medium">Equipment Name
+          <input type="text" id="eq_name" required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block text-sm font-medium">Type
+            <input type="text" id="eq_type" required
+              class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+          <label class="block text-sm font-medium">Quantity
+            <input type="number" id="eq_quantity" min="1"
+              class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+        </div>
+        <label class="block text-sm font-medium">Resource ID 
+          <input type="text" id="eq_resourceId" required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+        <label class="block text-sm font-medium">Condition
+          <select id="eq_condition"
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option value="good">Good</option>
+            <option value="degraded">Degraded</option>
+            <option value="faulty">Faulty</option>
+            <option value="broken">Broken</option>
+          </select>
+        </label>
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" id="eq_specialised" class="h-4 w-4" />
+          Is Specialized (Requires Approval)
+        </label>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" data-modal-close="createEquipmentModal"
+          class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">
+          Cancel
+        </button>
+        <button type="submit"
+          class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">
+          Create
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="modifyEquipmentModal" class="modal fixed inset-0 z-40 hidden items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Edit Equipment</h3>
+      <button data-modal-close="modifyEquipmentModal" title="Close">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+    </div>
+
+    <form id="modifyEquipmentForm" class="p-5">
+      <input type="hidden" id="ed_id" />
+
+      <div class="grid gap-4">
+        <label class="block text-sm font-medium">Equipment Name
+          <input type="text" id="ed_name" required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block text-sm font-medium">Type
+            <input type="text" id="ed_type" required
+              class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+          <label class="block text-sm font-medium">Quantity
+            <input type="number" id="ed_quantity" min="1"
+              class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+        </div>
+        <label class="block text-sm font-medium">Resource ID 
+          <input type="number" id="ed_resourceId" required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+        <label class="block text-sm font-medium">Condition
+          <select id="ed_condition"
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option value="good">Good</option>
+            <option value="degraded">Degraded</option>
+            <option value="faulty">Faulty</option>
+            <option value="broken">Broken</option>
+          </select>
+        </label>
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" id="ed_specialised" class="h-4 w-4" />
+          Is Specialized (Requires Approval)
+        </label>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" data-modal-close="modifyEquipmentModal"
+          class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">
+          Cancel
+        </button>
+        <button type="submit"
+          class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="deleteEquipmentModal" class="modal fixed inset-0 z-40 hidden items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-md rounded-lg bg-white shadow-xl">
+    <div class="border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Delete Equipment</h3>
+    </div>
+    <div class="p-5">
+      <input type="hidden" id="delete_equipment_id" />
+      <p class="text-sm text-slate-700">Are you sure you want to delete this equipment?</p>
+      <div class="mt-5 flex justify-end gap-2">
+        <button data-modal-close="deleteEquipmentModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Cancel</button>
+        <button id="deleteConfirmationBtn" type="button" class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Delete Equipment</button>
       </div>
     </div>
   </div>

@@ -38,7 +38,7 @@ def equipment():
 def approvals():
     return render_template("approvals.html")
 
-@viewsBp.get("/manage")
+@viewsBp.get("/equipment/manage")
 def equipment_manage():
     return render_template("equipment_manage.html")
 

@@ -15,11 +15,11 @@
     );
   }
 
-  function rowHtml(r, index) {
+  function rowHtml(r) {
     var sTone = statusTone[r.status] || "bg-slate-100 text-slate-700";
     return (
       "<tr>" +
-      '<td class="px-4 py-4 text-slate-500">' + (index + 1) + "</td>" +
+      '<td class="px-4 py-4 text-slate-500">' + (r.resourceId) + "</td>" +
       '<td class="px-4 py-4 font-medium">' + (r.name || "—") + "</td>" +
       '<td class="px-4 py-4">' + (r.type || "—") + "</td>" +
       '<td class="px-4 py-4">' + (r.capacity != null ? r.capacity : "—") + "</td>" +
@@ -91,7 +91,7 @@
         type:           byId("r_type").value.trim(),
         capacity:       Number(byId("r_capacity").value),
         location:       byId("r_location").value.trim(),
-        status:         byId("r_status").value,
+        status:         byId("r_status").value.toLowerCase(),
         isSpecialised:  byId("r_specialised").checked,
         description:    byId("r_description").value.trim(),
       });

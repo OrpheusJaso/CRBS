@@ -12,6 +12,7 @@ def register_blueprints(app: Flask) -> None:
     from .notification.notification import notificationBp
     from .dashboard.dashboard import dashboardBp
     from .equipment.equipment import equipmentBp
+    from .equipment_manage.equipment_manage import equipmentManageBp
     from .report.report import reportBp
 
     blueprints = [
@@ -23,6 +24,7 @@ def register_blueprints(app: Flask) -> None:
         notificationBp,
         dashboardBp,
         equipmentBp,
+        equipmentManageBp,
         reportBp,
     ]
 
