@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Manage Equipment{% endblock %}
+{% block active_page %}equipment_manage{% endblock %}
+    
+{% block content %}
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+      {% endif %}
+    {% endwith %}
+  
+<section id="resource">
+  <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <div>
+    <h2 class="text-2xl font-semibold">Manage Campus Equipment</h2>
+    <p class="text-sm text-slate-600">Modify the campus' equipment or create new equipments.</p>
+  </div>
+    <button onclick="openModal('createResourceModal')"
+    class="flex items-center gap-2 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white">
+      <i data-lucide="plus" class="h-4 w-4"></i> Create Equipment
+    </button>
+  </div>
+  <div class="grid xl:grid-cols">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[760px] text-left text-sm">
+          <thead class="border-b border-slate-200 bg-slate-50 text-slate-600">
+            <tr>
+             <th class="px-4 py-3 font-semibold">#</th>
+             <th class="px-4 py-3 font-semibold">Resource</th>
+             <th class="px-4 py-3 font-semibold">Name</th>
+             <th class="px-4 py-3 font-semibold">Type</th>
+             <th class="px-4 py-3 font-semibold">Quantity</th>
+             <th class="px-4 py-3 font-semibold">Specialized</th>
+             <th class="px-4 py-3 font-semibold">Condition</th>
+             <th class="px-4 py-3 font-semibold">Actions</th>
+            </tr>
+          </thead>
+        <tbody id="resourceRows" class="divide-y divide-slate-200">
+          <tr><td colspan="9" class="px-4 py-6 text-sm text-slate-500">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_script %}
+<script src="{{ url_for('static', filename='js/equipment_manage.js') }}"></script>
+{% endblock %}

@@ -105,7 +105,7 @@ def create():
 @role_required(*MODIFIERS)
 def modify_resource(resource_id):
     """Modify Resource Details. Blocked inside the 24-hour window."""
-    resource = resource_or_404(resource_id)
+    resource = Resource.query.get_or_404(resource_id)
     data = request.get_json(silent=True) or {}
 
     if "name" in data:
@@ -129,13 +129,7 @@ def modify_resource(resource_id):
 @resourceBp.delete("/<int:resource_id>")
 @role_required(*MODIFIERS)
 def delete_resource(resource_id):
-    resource = resource_or_404(resource_id)
+    resource = Resource.query.get_or_404(resource_id)
     db.session.delete(resource)
     db.session.commit()
     return jsonify(message="Resource has been deleted.")
-
-def resource_or_404(resourceId):
-    resource = Resource.query.get(resourceId)
-    if not resource:
-        abort(404, description= "Resource not found.")
-    return resource

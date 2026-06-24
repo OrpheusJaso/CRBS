@@ -1,5 +1,5 @@
 from extensions import db
-from models import Resource
+from models import Resource, Booking
 
 def validate_resource_data(data):
         """Satisfies E1: Validates details before saving."""
@@ -77,14 +77,14 @@ def allocate_to_booking(resource_id, booking_id):
         resource = Resource.query.get_or_404(resource_id)
         
         # In a real app, you would query your Booking model here:
-        # booking = Booking.query.get_or_404(booking_id)
-        # if booking.status != "Approved": raise ValueError("Booking is not approved.")
+        booking = Booking.query.get_or_404(booking_id)
+        if booking.status != "Approved": raise ValueError("Booking is not approved.")
         
         # Update the status of the resource to "In Use"
         resource.status = "In Use"
         
         # Here you would also update your link table or booking record:
-        # booking.resource_id = resource.resourceId
+        booking.resourceId = resource.resourceId
         
         db.session.commit()
         return True

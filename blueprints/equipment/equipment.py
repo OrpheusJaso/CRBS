@@ -9,7 +9,7 @@ equipmentBp = Blueprint("equipment", __name__, url_prefix="/api/equipment")
 
 # Specialised equipment requests come from staff (and admins acting as staff).
 REQUESTERS = ("staff", "admin")
-
+MODIFIERS = ("manager",)
 
 @equipmentBp.get("")
 @login_required
