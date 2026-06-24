@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Manage Resources{% endblock %}
+{% block active_page %}resource{% endblock %}
+    
+{% block content %}
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+      {% endif %}
+    {% endwith %}
+  
+<section id="resource">
+  <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <div>
+    <h2 class="text-2xl font-semibold">Manage Campus Resource</h2>
+    <p class="text-sm text-slate-600">Modify the current campus resources or create new resources.</p>
+  </div>
+    <button onclick="openModal('createResourceModal')"
+    class="flex items-center gap-2 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white">
+      <i data-lucide="plus" class="h-4 w-4"></i> Create Resource
+    </button>
+  </div>
+  <div class="overflow-hidden rounded-md border border-slate-200 bg-white">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[880px] text-left text-sm">
+          <thead class="border-b border-slate-200 bg-slate-50 text-slate-600">
+            <tr>
+             <th class="px-4 py-3 font-semibold">#</th>
+             <th class="px-4 py-3 font-semibold">Name</th>
+             <th class="px-4 py-3 font-semibold">Type</th>
+             <th class="px-4 py-3 font-semibold">Capacity</th>
+             <th class="px-4 py-3 font-semibold">Location</th>
+             <th class="px-4 py-3 font-semibold">Status</th>
+             <th class="px-4 py-3 font-semibold">Approval</th>
+             <th class="px-4 py-3 font-semibold">Description</th>
+             <th class="px-4 py-3 font-semibold">Actions</th>
+            </tr>
+          </thead>
+        <tbody id="resourceRows" class="divide-y divide-slate-200">
+          <tr><td colspan="9" class="px-4 py-6 text-sm text-slate-500">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_script %}
+<script src="{{ url_for('static', filename='js/resource.js') }}"></script>
+{% endblock %}

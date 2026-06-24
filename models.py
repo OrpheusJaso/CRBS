@@ -157,6 +157,7 @@ class Equipment(db.Model):
     type = db.Column(db.String(50), nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
     isSpecialised = db.Column(db.Boolean, nullable=False, default=False)
+    # good | degraded | faulty | broken
     condition = db.Column(db.String(50), nullable=False, default="good")
 
     def to_dict(self):

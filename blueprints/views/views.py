@@ -8,21 +8,21 @@ viewsBp = Blueprint("views", __name__)
 def login():
     return render_template("login.html")
 
-
 @viewsBp.get("/signup")
 def signup():
     return render_template("signup.html")
-
 
 @viewsBp.get("/dashboard")
 def dashboard():
     return render_template("dashboard.html")
 
-
 @viewsBp.get("/search")
 def search():
     return render_template("search.html")
 
+@viewsBp.get("/resource")
+def resource():
+    return render_template("resource.html")
 
 @viewsBp.get("/bookings")
 def bookings():
@@ -38,6 +38,9 @@ def equipment():
 def approvals():
     return render_template("approvals.html")
 
+@viewsBp.get("/equipment/manage")
+def equipment_manage():
+    return render_template("equipment_manage.html")
 
 @viewsBp.get("/profile")
 def profile():

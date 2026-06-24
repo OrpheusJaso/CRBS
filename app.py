@@ -19,6 +19,7 @@ def create_app(config_class=Config):
             status="ok",
             endpoints=[
                 "/api/user/login",
+                "/api/resource",
                 "/api/resource/search",
                 "/api/booking",
                 "/api/notification",
