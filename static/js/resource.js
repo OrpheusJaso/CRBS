@@ -2,11 +2,10 @@
   var resources = {};
 
   var statusTone = {
-    confirmed: "bg-emerald-50 text-emerald-700",
-    checked_in: "bg-sky-50 text-sky-800",
-    pending: "bg-slate-100 text-slate-700",
-    cancelled: "bg-rose-50 text-rose-700",
-    no_show: "bg-rose-50 text-rose-700",
+    available:   "bg-emerald-50 text-emerald-700",
+    unavailable: "bg-rose-50 text-rose-700",
+    maintenance: "bg-amber-50 text-amber-700",
+    reserved:    "bg-sky-50 text-sky-800",
   };
 
   function actionsHtml(r) {
@@ -77,7 +76,7 @@
     byId("ed_location").value    = r.location    || "";
     byId("ed_status").value      = r.status      || "available";
     byId("ed_description").value = r.description || "";
-    openModal("editResourceModal");
+    openModal("modifyResourceModal");
   }
 
   function openDelete(id) {
@@ -85,7 +84,26 @@
     openModal("deleteResourceModal");
   }
     
-  byId("editResourceForm")?.addEventListener("submit", async function (e) {
+  byId("createResourceForm")?.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    try {
+      await api.post("/api/resource", {
+        name:           byId("r_name").value.trim(),
+        type:           byId("r_type").value.trim(),
+        capacity:       Number(byId("r_capacity").value),
+        location:       byId("r_location").value.trim(),
+        status:         byId("r_status").value,
+        isSpecialised:  byId("r_specialised").checked,
+        description:    byId("r_description").value.trim(),
+      });
+      closeModal("createResourceModal");
+      showToast("Success", "Resource have been created.");  
+      byId("createResourceForm").reset();
+      load();
+    } catch (err) { showToast("Unable to create resource: ", err.message); }
+  });
+
+  byId("modifyResourceForm")?.addEventListener("submit", async function (e) {
     e.preventDefault();
     try {
       await api.put("/api/resource/" + byId("ed_id").value, {
@@ -96,7 +114,7 @@
         status:      byId("ed_status").value,
         description: byId("ed_description").value,
       });
-      closeModal("editResourceModal");
+      closeModal("modifyResourceModal");
       showToast("Resource updated", "Changes have been saved.");
       load();
     } catch (err) { showToast("Could not update", err.message); }
@@ -114,9 +132,5 @@
     }
   });
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", load);
-  } else {
-    load();
-  }
+  document.addEventListener("DOMContentLoaded", load);
 })();

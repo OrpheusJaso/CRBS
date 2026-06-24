@@ -3,13 +3,14 @@ from extensions import (
 )
 from models import Resource, Booking
 from datetime import datetime
-from blueprints.booking.services import has_conflict, parse_dt
+from blueprints.booking.services import parse_dt
+from .services import is_duplicate, validate_resource_data
 
 resourceBp = Blueprint("resource", __name__, url_prefix="/api/resource")
 
 # Searching/booking is for students and staff (matches the UI sidebar roles).
 SEARCHERS = ("student", "staff")
-MODIFIERS = ("manager")
+MODIFIERS = ("manager",)
 
 @resourceBp.get("")
 @login_required
@@ -56,7 +57,7 @@ def search():
     for r in candidates:
         item = r.to_dict()
         if start and end:
-            available = r.status == "available" and not has_conflict(
+            available = r.status == "available" and not is_duplicate(
                 r.resourceId, start, end
             )
             item["available"] = available
@@ -100,4 +101,41 @@ def create():
 
     return jsonify(resource=resource.to_dict()), 201
 
+@resourceBp.put("/<int:resource_id>")
+@role_required(*MODIFIERS)
+def modify_resource(resource_id):
+    """Modify Resource Details. Blocked inside the 24-hour window."""
+    resource = resource_or_404(resource_id)
+    data = request.get_json(silent=True) or {}
 
+    if "name" in data:
+        resource.name = data["name"]
+    if "type" in data:
+        resource.type = data["type"]
+    if "capacity" in data:
+        resource.capacity = data["capacity"]
+    if "location" in data:
+        resource.location = data["location"]
+    if "status" in data:
+        resource.status = data["status"]
+    if "description" in data:
+        resource.description = data["description"]
+    if "isSpecialised" in data:
+        resource.isSpecialised = data["isSpecialised"]
+        
+    db.session.commit()
+    return jsonify(resource=resource.to_dict())
+
+@resourceBp.delete("/<int:resource_id>")
+@role_required(*MODIFIERS)
+def delete_resource(resource_id):
+    resource = resource_or_404(resource_id)
+    db.session.delete(resource)
+    db.session.commit()
+    return jsonify(message="Resource has been deleted.")
+
+def resource_or_404(resourceId):
+    resource = Resource.query.get(resourceId)
+    if not resource:
+        abort(404, description= "Resource not found.")
+    return resource

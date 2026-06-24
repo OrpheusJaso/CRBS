@@ -103,17 +103,143 @@
   </div>
 </div>
 
-<div id="cancelModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4">
+<div id="createResourceModal" class="modal fixed inset-0 z-40 hidden items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Create Resource</h3>
+      <button data-modal-close="createResourceModal" title="Close">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+    </div>
+    <form id="createResourceForm" class="p-5">
+      <div class="grid gap-4">
+        <label class="block text-sm font-medium">Resource Name
+          <input type="text" id="r_name" required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block text-sm font-medium">Type
+            <input type="text" id="r_type" required
+              class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+          <label class="block text-sm font-medium">Capacity
+            <input type="number" id="r_capacity" min="1"
+              class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+        </div>
+        <label class="block text-sm font-medium">Location
+          <input type="text" id="r_location" required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+        <label class="block text-sm font-medium">Status
+          <select id="r_status"
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="reserved">Reserved</option>
+          </select>
+        </label>
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" id="r_specialised" class="h-4 w-4" />
+          Requires Approval
+        </label>
+        <label class="block text-sm font-medium">Description
+          <textarea id="r_description"
+            class="mt-1 min-h-20 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </label>
+      </div>
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" data-modal-close="createResourceModal"
+          class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">
+          Cancel
+        </button>
+        <button type="submit"
+          class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">
+          Create
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="modifyResourceModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-lg rounded-lg bg-white shadow-xl">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+      <h3 class="font-semibold">Edit Resource</h3>
+      <button data-modal-close="modifyResourceModal" title="Close">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+    </div>
+
+    <form id="modifyResourceForm" class="p-5">
+      <input type="hidden" id="ed_id" />
+
+      <div class="grid gap-4">
+
+        <label class="block text-sm font-medium">Resource Name
+          <input type="text" id="ed_name"
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block text-sm font-medium">Type
+            <input type="text" id="ed_type"
+              class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+          <label class="block text-sm font-medium">Capacity
+            <input type="number" id="ed_capacity" min="1"
+              class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+        </div>
+
+        <label class="block text-sm font-medium">Location
+          <input type="text" id="ed_location"
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+
+        <label class="block text-sm font-medium">Status
+          <select id="ed_status"
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="reserved">Reserved</option>
+          </select>
+        </label>
+
+        <label class="block text-sm font-medium">Description
+          <textarea id="ed_description"
+            class="mt-1 min-h-20 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </label>
+
+      </div>
+
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" data-modal-close="modifyResourceModal"
+          class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">
+          Cancel
+        </button>
+        <button type="submit"
+          class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="deleteResourceModal" class="modal fixed inset-0 z-40 items-center justify-center bg-slate-950/50 p-4">
   <div class="w-full max-w-md rounded-lg bg-white shadow-xl">
     <div class="border-b border-slate-200 px-5 py-4">
-      <h3 class="font-semibold">Cancel Booking</h3>
+      <h3 class="font-semibold">Delete Resource</h3>
     </div>
     <div class="p-5">
-      <input type="hidden" id="cancel_id" />
-      <p class="text-sm text-slate-700">Are you sure you want to cancel this booking? The resource will be released for other users.</p>
+      <input type="hidden" id="delete_id" />
+      <p class="text-sm text-slate-700">Are you sure you want to delete this resource?</p>
       <div class="mt-5 flex justify-end gap-2">
-        <button data-modal-close="cancelModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Keep Booking</button>
-        <button id="cancelConfirmBtn" type="button" class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Cancel Booking</button>
+        <button data-modal-close="deleteResourceModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Cancel</button>
+        <button id="deleteConfirmBtn" type="button" class="rounded-md bg-rose-700 px-4 py-2 text-sm font-semibold text-white">Delete Resource</button>
       </div>
     </div>
   </div>

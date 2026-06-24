@@ -1,10 +1,7 @@
 from extensions import db
 from models import Resource
 
-class ResourceService:
-    
-    @staticmethod
-    def validate_resource_data(data):
+def validate_resource_data(data):
         """Satisfies E1: Validates details before saving."""
         name = data.get('name')
         capacity = data.get('capacity')
@@ -20,8 +17,7 @@ class ResourceService:
             
         return True
 
-    @staticmethod
-    def is_duplicate(name, location, exclude_id=None):
+def is_duplicate(name, location, exclude_id=None):
         """Satisfies NFR: Prevents duplicate resources in the same location."""
         query = Resource.query.filter(
             Resource.name.ilike(name.strip()),
@@ -32,15 +28,14 @@ class ResourceService:
         
         return query.first() is not None
     
-    @staticmethod
-    def create_resource(form_data):
+def create_resource(form_data):
         """Handles Normal Flow: Create Resource."""
         # 1. Validation (E1)
-        if not ResourceService.validate_resource_data(form_data):
+        if not validate_resource_data(form_data):
             raise ValueError("Invalid Resource Details, please try again")
             
         # 2. Duplicate Check (NFR)
-        if ResourceService.is_duplicate(form_data.get('name'), form_data.get('location')):
+        if is_duplicate(form_data.get('name'), form_data.get('location')):
             raise ValueError("A resource with this name already exists at this location.")
 
         new_resource = Resource(
@@ -56,15 +51,14 @@ class ResourceService:
         db.session.commit()
         return new_resource
 
-    @staticmethod
-    def update_resource(resource_id, form_data):
+def update_resource(resource_id, form_data):
         """Handles Alternative Flow A1: Modify Current Resource."""
         resource = Resource.query.get_or_404(resource_id)
         
-        if not ResourceService.validate_resource_data(form_data):
+        if not validate_resource_data(form_data):
             raise ValueError("Invalid Resource Details, please try again")
             
-        if ResourceService.is_duplicate(form_data.get('name'), form_data.get('location'), exclude_id=resource_id):
+        if is_duplicate(form_data.get('name'), form_data.get('location'), exclude_id=resource_id):
             raise ValueError("Another resource with this name already exists at this location.")
 
         resource.name = form_data.get('name').strip()
@@ -78,8 +72,7 @@ class ResourceService:
         db.session.commit()
         return resource
 
-    @staticmethod
-    def allocate_to_booking(resource_id, booking_id):
+def allocate_to_booking(resource_id, booking_id):
         """Handles Alternative Flow A3: Assign Resource to Booking."""
         resource = Resource.query.get_or_404(resource_id)
         
