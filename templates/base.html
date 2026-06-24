@@ -80,7 +80,11 @@
           </a>
           <a href="{{ url_for('views.resource') }}" data-page="resource" data-roles="manager, admin"
              class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <i data-lucide="wrench" class="h-4 w-4"></i> Manage Resource
+            <i data-lucide="database" class="h-4 w-4"></i> Manage Resource
+          </a>
+          <a href="{{ url_for('views.maintenance') }}" data-page="maintenance" data-roles="manager, admin"
+             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
+            <i data-lucide="wrench" class="h-4 w-4"></i> Resource Maintenance
           </a>
           <a href="{{ url_for('views.equipment') }}" data-page="equipment" data-roles="staff,manager,admin"
              class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
@@ -125,7 +129,8 @@
         approvals: "{{ url_for('views.approvals') }}",
         profile: "{{ url_for('views.profile') }}",
         resource: "{{ url_for('views.resource') }}",
-        equipmentManagement: "{{ url_for('views.equipment_manage') }}"
+        equipmentManagement: "{{ url_for('views.equipment_manage') }}",
+        maintenance: "{{ url_for('views.maintenance') }}"
       }
     };
   </script>

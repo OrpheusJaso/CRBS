@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Resource Maintenance{% endblock %}
+{% block active_page %}maintenance{% endblock %}
+
+{% block content %}
+<section id="maintenance">
+  <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h2 class="text-2xl font-semibold">Resource Maintenance</h2>
+      <p class="text-sm text-slate-600">Review resources under maintenance and manage maintenance.</p>
+    </div>
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-3">
+    <div class="rounded-md border border-rose-200 bg-rose-50 p-4">
+      <p class="text-sm text-slate-500">Resources Under Maintenance</p>
+      <p class="mt-2 text-3xl font-semibold text-rose-950">2</p>
+    </div>
+    <div class="rounded-md border border-slate-200 bg-white p-4">
+      <p class="text-sm text-slate-500">Resources Completed Maintenance</p>
+      <p class="mt-2 text-3xl font-semibold">4</p>
+    </div>
+    <div class="rounded-md border border-slate-200 bg-white p-4">
+      <p class="text-sm text-slate-500">Total Maintenances Done</p>
+      <p class="mt-2 text-3xl font-semibold">7</p>
+    </div>
+  </div>
+
+  <div class="mt-5 grid gap-5 xl:grid-cols-[0.85fr_1.15fr]">
+    <form id="equipmentForm" class="rounded-md border border-slate-200 bg-white p-4">
+      <div class="grid gap-4">
+        <label class="block text-sm font-medium">Equipment
+          <select id="eq_name" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option>Loading…</option>
+          </select>
+        </label>
+        <label class="block text-sm font-medium">Purpose
+          <textarea id="eq_purpose" class="mt-2 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">Guest lecture with external speaker</textarea>
+        </label>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block text-sm font-medium">Date
+            <input type="date" id="eq_date" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+          <label class="block text-sm font-medium">Attendees
+            <input type="number" id="eq_attendees" value="80" class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          </label>
+        </div>
+        <div class="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
+          <div class="flex gap-2">
+            <i data-lucide="shield-alert" class="mt-0.5 h-4 w-4"></i>
+            <p>This request will remain pending until a resource manager approves it.</p>
+          </div>
+        </div>
+        <button type="submit" class="flex items-center justify-center gap-2 rounded-md bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white">
+          <i data-lucide="send" class="h-4 w-4"></i> Submit Request
+        </button>
+      </div>
+    </form>
+
+    <div class="space-y-4">
+      <div class="rounded-md border border-slate-200 bg-white p-4">
+        <h3 class="mb-3 font-semibold">Resource Status Update</h3>
+        <div class="grid gap-3 text-sm">
+          <label class="block font-medium">Resource
+            <select class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+              <option>Projector P-04</option>
+              <option>Meeting Room B-214</option>
+              <option>Computer Lab A-203</option>
+            </select>
+          </label>
+          <label class="block font-medium">Status
+            <select class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+              <option>Available</option>
+              <option>Maintenance</option>
+              <option>Faulty</option>
+            </select>
+          </label>
+          <button data-toast data-toast-title="Resource updated" data-toast-msg="Affected users will receive maintenance notifications." class="rounded-md bg-sky-700 px-4 py-2 text-sm font-semibold text-white">Save Status</button>
+        </div>
+      </div>
+      <div class="rounded-md border border-amber-200 bg-amber-50 p-4">
+        <div class="mb-2 flex items-center gap-2 font-semibold text-amber-950">
+          <i data-lucide="shield-alert" class="h-4 w-4"></i> Admin Control
+        </div>
+        <p class="text-sm text-amber-900">Approving a specialized resource creates a confirmed booking and sends notification to the requester.</p>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

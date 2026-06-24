@@ -45,3 +45,7 @@ def equipment_manage():
 @viewsBp.get("/profile")
 def profile():
     return render_template("profile.html")
+
+@viewsBp.get("/maintenance")
+def maintenance():
+    return render_template("maintenance.html")
