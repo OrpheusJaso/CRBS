@@ -1,4 +1,5 @@
-"""US07 Report Issues: students flag faulty/damaged resources to managers."""
+"""US07 Report Issues: students flag faulty/damaged resources to managers.
+    UR08 Receive Report: resource manager receive resource report from students"""
 from extensions import (
     Blueprint, request, jsonify, abort, db, login_required, role_required,
     current_user_id, current_role,
@@ -11,7 +12,7 @@ issueBp = Blueprint("issue", __name__, url_prefix="/api/issue")
 
 # Reporting an issue is for the people who use resources.
 REPORTERS = ("student", "staff")
-
+VIEWERS = ("manager", "admin")
 
 @issueBp.get("")
 @login_required

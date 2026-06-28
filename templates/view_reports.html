@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}View Reports{% endblock %}
+{% block active_page %}view_reports{% endblock %}
+
+{% block content %}
+<section id="reportIssue">
+  <div class="mb-5">
+    <h2 class="text-2xl font-semibold">View Reports</h2>
+    <p class="text-sm text-slate-600">View the reports of faculty or damaged resources made by the students and faculty staff. Place the resource under maintenance at "Resource Maintenance".</p>
+  </div>
+
+  <div class="grid gap-5 xl:grid-cols-[0.85fr_1fr]">
+    <div class="rounded-md border border-slate-200 bg-white p-4">
+      <h3 class="mb-3 font-semibold">Reported Issues</h3>
+      <div id="iss_list" class="space-y-2 text-sm">
+        <p class="text-slate-500">Loading…</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_script %}
+<script src="{{ url_for('static', filename='js/view_reports.js') }}"></script>
+{% endblock %}
