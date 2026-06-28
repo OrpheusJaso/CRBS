@@ -1,7 +1,8 @@
 """Booking business rules: conflict checks, the 24-hour policy, recurrence."""
 from datetime import datetime, timedelta
 from extensions import db
-from models import Booking, Resource, Notification
+from models import Booking, Resource, Notification, User
+from email_service import send_email
 
 # Booking cannot be modified/cancelled within this window of its start time.
 MODIFY_LOCK_HOURS = 24
@@ -14,8 +15,16 @@ ACTIVE_STATUSES = ("confirmed", "pending", "checked_in")
 
 
 def notify(user_id, title, message, type="info"):
-    """Create a notification row (used by the bell + booking events)."""
+    """Create a notification row and best-effort email it (US06).
+
+    The in-app Notification row is the durable primary channel; the email is a
+    secondary channel that falls back silently to the row if delivery fails.
+    """
     db.session.add(Notification(userId=user_id, title=title, message=message, type=type))
+    # US06 normal-flow step 2: also dispatch to the student's email (best effort).
+    user = User.query.get(user_id)
+    if user and user.email:
+        send_email(user.email, title, message)
 
 
 def parse_dt(value):

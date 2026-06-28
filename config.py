@@ -37,3 +37,20 @@ class Config:
         os.path.abspath(os.path.dirname(__file__)), "uploads"
     )
     MAX_CONTENT_LENGTH = 8 * 1024 * 1024  # 8 MB cap per upload
+
+    # Secondary email channel for notifications (US06). Opt-in and OFF by
+    # default so the prototype runs with no SMTP setup -- notifications still
+    # appear in-app. Set MAIL_ENABLED=true plus the MAIL_* vars in .env to
+    # actually send (e.g. a Gmail app password or institutional SMTP relay).
+    MAIL_ENABLED = os.environ.get("MAIL_ENABLED", "").lower() in ("1", "true", "yes")
+    MAIL_SERVER = os.environ.get("MAIL_SERVER")
+    MAIL_PORT = int(os.environ.get("MAIL_PORT", "587"))
+    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", "true").lower() in ("1", "true", "yes")
+    MAIL_USE_SSL = os.environ.get("MAIL_USE_SSL", "").lower() in ("1", "true", "yes")
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+    MAIL_DEFAULT_SENDER = os.environ.get(
+        "MAIL_DEFAULT_SENDER", os.environ.get("MAIL_USERNAME")
+    )
+    MAIL_MAX_RETRIES = int(os.environ.get("MAIL_MAX_RETRIES", "1"))
+    MAIL_TIMEOUT = int(os.environ.get("MAIL_TIMEOUT", "10"))

@@ -80,7 +80,12 @@ def _register_error_handlers(app: Flask) -> None:
 
     @app.errorhandler(401)
     def unauthorised(e):
-        return jsonify(error="Unauthorised."), 401
+        # Surface a custom abort(401, description=...) message (e.g. the login
+        # route's "Invalid email or password.") while keeping a generic message
+        # for bare abort(401) calls from the auth decorators.
+        from werkzeug.exceptions import Unauthorized
+        message = e.description if e.description != Unauthorized.description else "Unauthorised."
+        return jsonify(error=message), 401
 
     @app.errorhandler(403)
     def forbidden(e):
