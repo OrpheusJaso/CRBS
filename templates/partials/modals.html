@@ -26,6 +26,10 @@
         <label class="block text-sm font-medium">Attendees
           <input type="number" id="bk_capacity" value="10" min="1" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
         </label>
+        <label id="bk_docWrap" class="hidden block text-sm font-medium">Supporting document (required for approval)
+          <input type="file" id="bk_document" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+          <span class="mt-1 block text-xs font-normal text-amber-700">This resource needs manager approval. Attach a proposal or supporting letter.</span>
+        </label>
       </div>
       <div class="mt-5 flex justify-end gap-2">
         <button type="button" data-modal-close="bookingModal" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold">Back</button>
@@ -66,8 +70,11 @@
         <label class="block text-sm font-medium">Purpose
           <textarea id="rc_purpose" class="mt-1 min-h-16 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">Weekly tutorial class</textarea>
         </label>
+        <label class="block text-sm font-medium">Supporting document (required for approval)
+          <input type="file" id="rc_document" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
         <div class="rounded-md border border-sky-200 bg-sky-50 p-3 text-sm text-sky-950">
-          Conflict checking runs across all generated dates before any are saved.
+          Recurring bookings require a supporting document and manager approval. Conflict checking runs across all generated dates before any are saved.
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">

@@ -47,6 +47,7 @@ def seed_demo_data():
 
     now = datetime.utcnow()
     staff = "u-staff"
+    student = "u-student"
     db.session.add_all([
         Booking(resourceId=resources[0].resourceId, userId=staff,
                 purpose="Research group discussion",
@@ -60,6 +61,23 @@ def seed_demo_data():
                 purpose="Guest lecture",
                 startTime=now + timedelta(days=4), endTime=now + timedelta(days=4, hours=3),
                 status="pending"),
+
+        # --- Student bookings (US05/US07 demos) ---------------------------
+        # Modifiable: starts well outside the 24h lock window.
+        Booking(resourceId=resources[3].resourceId, userId=student,
+                purpose="Group project meeting",
+                startTime=now + timedelta(days=3), endTime=now + timedelta(days=3, hours=2),
+                status="confirmed"),
+        # Check-in ready: currently within its time window.
+        Booking(resourceId=resources[1].resourceId, userId=student,
+                purpose="Self-study session",
+                startTime=now - timedelta(minutes=5), endTime=now + timedelta(hours=1),
+                status="confirmed"),
+        # Past booking: a no-show sweep will flag it; also usable for Report Issue.
+        Booking(resourceId=resources[0].resourceId, userId=student,
+                purpose="Tutorial discussion",
+                startTime=now - timedelta(days=1, hours=1), endTime=now - timedelta(days=1),
+                status="checked_in"),
     ])
 
     db.session.add_all([
@@ -69,6 +87,9 @@ def seed_demo_data():
         Notification(userId=staff, title="Maintenance alert",
                      message="Projector P-04 is unavailable Friday 13:00-17:00.",
                      type="maintenance"),
+        Notification(userId=student, title="Booking confirmed",
+                     message="Seminar Room C-101 reserved for your group project meeting.",
+                     type="info"),
     ])
 
     db.session.add_all([

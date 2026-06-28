@@ -8,6 +8,8 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
 </head>
+{% set role_labels = {'student': 'Student', 'staff': 'Staff / Faculty', 'manager': 'Resource Manager', 'admin': 'Admin'} %}
+{% set role_label = role_labels.get(current_user_role, 'Staff') %}
 <body class="bg-slate-100 text-slate-900">
 
   <!-- Toast -->
@@ -33,7 +35,7 @@
             <i data-lucide="building-2" class="h-5 w-5"></i>
           </div>
           <div>
-            <p id="headerContextLabel" class="text-xs font-medium text-slate-500">MMU Role Portal</p>
+            <p id="headerContextLabel" class="text-xs font-medium text-slate-500">MMU {{ role_label }} Portal</p>
             <h1 class="text-base font-semibold">Campus Resource Booking</h1>
           </div>
         </div>
@@ -55,8 +57,8 @@
           </div>
           <a href="{{ url_for('views.profile') }}" class="hidden items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm hover:bg-slate-50 sm:flex">
             <i data-lucide="user-round" class="h-4 w-4"></i>
-            <span id="headerUserName">Dr. Aisyah</span>
-            <span id="headerRoleBadge" class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">Staff</span>
+            <span id="headerUserName">{{ current_user_name or role_label }}</span>
+            <span id="headerRoleBadge" class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">{{ role_label }}</span>
           </a>
         </div>
       </div>
@@ -66,34 +68,22 @@
       <!-- Sidebar -->
       <aside id="sidebar" class="fixed inset-y-16 left-0 z-20 hidden w-72 border-r border-slate-200 bg-white p-4 md:sticky md:block md:h-[calc(100vh-4rem)]">
         <nav class="space-y-2">
-          <a href="{{ url_for('views.dashboard') }}" data-page="dashboard" data-roles="student,staff,manager,admin"
-             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard &amp; Alerts
+          {% set nav_items = [
+            {'url': url_for('views.dashboard'), 'page': 'dashboard', 'roles': ['student', 'staff', 'manager', 'admin'], 'icon': 'layout-dashboard', 'label': 'Dashboard & Alerts'},
+            {'url': url_for('views.search'), 'page': 'search', 'roles': ['student', 'staff'], 'icon': 'search', 'label': 'Search & Book'},
+            {'url': url_for('views.bookings'), 'page': 'bookings', 'roles': ['student', 'staff'], 'icon': 'calendar-days', 'label': 'Manage Bookings'},
+            {'url': url_for('views.report_issue'), 'page': 'report_issue', 'roles': ['student', 'staff'], 'icon': 'flag', 'label': 'Report Issue'},
+            {'url': url_for('views.resource'), 'page': 'resource', 'roles': ['manager', 'admin'], 'icon': 'wrench', 'label': 'Manage Resource'},
+            {'url': url_for('views.equipment'), 'page': 'equipment', 'roles': ['staff', 'manager', 'admin'], 'icon': 'projector', 'label': 'Specialized Equipment'},
+            {'url': url_for('views.approvals'), 'page': 'approvals', 'roles': ['manager', 'admin'], 'icon': 'clipboard-check', 'label': 'Approvals'},
+            {'url': url_for('views.profile'), 'page': 'profile', 'roles': ['student', 'staff', 'manager', 'admin'], 'icon': 'settings', 'label': 'Profile Settings'}
+          ] %}
+          {% for item in nav_items %}
+          <a href="{{ item.url }}" data-page="{{ item.page }}" data-roles="{{ item.roles | join(',') }}"
+             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50{% if current_user_role not in item.roles %} hidden{% endif %}{% if item.page == (self.active_page() | trim) %} active{% endif %}">
+            <i data-lucide="{{ item.icon }}" class="h-4 w-4"></i> {{ item.label }}
           </a>
-          <a href="{{ url_for('views.search') }}" data-page="search" data-roles="student,staff"
-             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <i data-lucide="search" class="h-4 w-4"></i> Search &amp; Book
-          </a>
-          <a href="{{ url_for('views.bookings') }}" data-page="bookings" data-roles="student,staff"
-             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <i data-lucide="calendar-days" class="h-4 w-4"></i> Manage Bookings
-          </a>
-          <a href="{{ url_for('views.resource') }}" data-page="resource" data-roles="manager, admin"
-             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <i data-lucide="wrench" class="h-4 w-4"></i> Manage Resource
-          </a>
-          <a href="{{ url_for('views.equipment') }}" data-page="equipment" data-roles="staff,manager,admin"
-             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <i data-lucide="projector" class="h-4 w-4"></i> Specialized Equipment
-          </a>
-          <a href="{{ url_for('views.approvals') }}" data-page="approvals" data-roles="manager,admin"
-             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <i data-lucide="clipboard-check" class="h-4 w-4"></i> Approvals
-          </a>
-          <a href="{{ url_for('views.profile') }}" data-page="profile" data-roles="student,staff,manager,admin"
-             class="nav-btn flex w-full items-center gap-3 rounded-md border border-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <i data-lucide="settings" class="h-4 w-4"></i> Profile Settings
-          </a>
+          {% endfor %}
         </nav>
         <div class="mt-6 rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900">
           <div class="mb-2 flex items-center gap-2 font-semibold">
@@ -116,11 +106,14 @@
     // Inject Flask route URLs + the active page for the external scripts.
     window.CRBS = {
       activePage: "{% block active_page %}dashboard{% endblock %}",
+      role: "{{ current_user_role or '' }}",
+      name: "{{ current_user_name or '' }}",
       urls: {
         login: "{{ url_for('views.login') }}",
         dashboard: "{{ url_for('views.dashboard') }}",
         search: "{{ url_for('views.search') }}",
         bookings: "{{ url_for('views.bookings') }}",
+        reportIssue: "{{ url_for('views.report_issue') }}",
         equipment: "{{ url_for('views.equipment') }}",
         approvals: "{{ url_for('views.approvals') }}",
         profile: "{{ url_for('views.profile') }}",

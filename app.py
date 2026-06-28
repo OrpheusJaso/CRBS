@@ -11,6 +11,7 @@ def create_app(config_class=Config):
     _init_extensions(app)
     _register_blueprints(app)
     _register_error_handlers(app)
+    _register_context(app)
 
     @app.route("/api")
     def api_index():
@@ -28,6 +29,9 @@ def create_app(config_class=Config):
                 "/api/report/export",
             ],
         )
+
+    # Ensure the upload directory exists for booking documents / issue images.
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     # Build the schema and seed demo data on first run.
     with app.app_context():
@@ -48,6 +52,23 @@ def _register_blueprints(app: Flask) -> None:
     """Register all blueprints. Imported here to avoid circular imports."""
     from blueprints import register_blueprints
     register_blueprints(app)
+
+
+def _register_context(app: Flask) -> None:
+    """Expose the signed-in user's role/name to every template.
+
+    Lets base.html render the correct role server-side instead of shipping a
+    hardcoded "Staff" placeholder that the JS corrects ~0.5s later (the flash).
+    """
+
+    @app.context_processor
+    def inject_current_user():
+        role = current_role()
+        name = None
+        if role:
+            user = models.User.query.get(current_user_id())
+            name = user.name if user else None
+        return {"current_user_role": role, "current_user_name": name}
 
 
 def _register_error_handlers(app: Flask) -> None:

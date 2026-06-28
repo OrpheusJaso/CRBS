@@ -18,7 +18,7 @@
   };
 
   window.currentRole = function () {
-    return localStorage.getItem("crbsRole") || "staff";
+    return CRBS.role || localStorage.getItem("crbsRole") || "staff";
   };
 
   function applyRoleAccess(role, name) {
@@ -41,6 +41,7 @@
   window.logout = async function () {
     try { await api.post("/api/user/logout"); } catch (e) {}
     localStorage.removeItem("crbsRole");
+    localStorage.removeItem("crbsName");
     window.location.href = CRBS.urls.login;
   };
 
@@ -105,9 +106,17 @@
   // --- Session bootstrap -------------------------------------------------
   document.addEventListener("DOMContentLoaded", async function () {
     refreshIcons();
+
+    // The server already rendered the correct role into the page (base.html),
+    // so there's no flash. Still reconcile the nav/header from CRBS.role in
+    // case JS-driven state (active highlight) needs it; fall back to cache.
+    var bootRole = CRBS.role || localStorage.getItem("crbsRole");
+    if (bootRole) applyRoleAccess(bootRole, CRBS.name || localStorage.getItem("crbsName"));
+
     try {
       var data = await api.get("/api/user/me");      // 401 -> redirect via api.js
       localStorage.setItem("crbsRole", data.user.role);
+      localStorage.setItem("crbsName", data.user.name || "");
       applyRoleAccess(data.user.role, data.user.name);
       refreshBadge();
     } catch (e) {
