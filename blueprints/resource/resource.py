@@ -3,7 +3,7 @@ from extensions import (
 )
 from models import Resource, Booking
 from datetime import datetime
-from blueprints.booking.services import parse_dt
+from blueprints.booking.services import parse_dt, has_conflict
 from .services import is_duplicate, validate_resource_data
 
 resourceBp = Blueprint("resource", __name__, url_prefix="/api/resource")
@@ -38,6 +38,10 @@ def search():
     if capacity:
         q = q.filter(Resource.capacity >= capacity)
 
+    location = request.args.get("location")
+    if location:
+        q = q.filter(Resource.location.ilike(f"%{location.strip()}%"))
+
     candidates = q.all()
 
     # If a date/time window is given, compute availability per resource.
@@ -57,7 +61,8 @@ def search():
     for r in candidates:
         item = r.to_dict()
         if start and end:
-            available = r.status == "available" and not is_duplicate(
+            # Availability = bookable status AND no overlapping active booking.
+            available = r.status == "available" and not has_conflict(
                 r.resourceId, start, end
             )
             item["available"] = available

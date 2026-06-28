@@ -6,6 +6,9 @@ from models import Booking, Resource, Notification
 # Booking cannot be modified/cancelled within this window of its start time.
 MODIFY_LOCK_HOURS = 24
 
+# How long before startTime a check-in is permitted (US05 E2 grace window).
+CHECKIN_EARLY_MINUTES = 15
+
 # Statuses that occupy a resource time slot.
 ACTIVE_STATUSES = ("confirmed", "pending", "checked_in")
 
@@ -48,3 +51,27 @@ def recurrence_dates(start, end, pattern, until):
         yield cur_start, cur_end
         cur_start += step
         cur_end += step
+
+
+def sweep_no_shows():
+    """US05 E3: auto-cancel confirmed bookings whose window passed un-checked-in.
+
+    A lightweight, on-demand replacement for a background scheduler — runs each
+    time bookings are listed. Only `confirmed` rows are affected; `checked_in`,
+    `pending`, `cancelled` and already-`no_show` rows are left alone. Returns the
+    number of bookings flipped so callers can react if needed.
+    """
+    now = datetime.utcnow()
+    stale = Booking.query.filter(
+        Booking.status == "confirmed",
+        Booking.endTime < now,
+    ).all()
+    for b in stale:
+        b.status = "no_show"
+        name = b.resource.name if b.resource else "your booking"
+        notify(b.userId, "Booking auto-cancelled",
+               f"No check-in was made for {name} during its time slot, "
+               f"so it was marked as a no-show.", type="checkin")
+    if stale:
+        db.session.commit()
+    return len(stale)

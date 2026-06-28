@@ -15,6 +15,7 @@ def register_blueprints(app: Flask) -> None:
     from .maintenance.maintenance import maintenanceBp
     from .equipment_manage.equipment_manage import equipmentManageBp
     from .report.report import reportBp
+    from .issue.issue import issueBp
 
     blueprints = [
         viewsBp,
@@ -28,6 +29,7 @@ def register_blueprints(app: Flask) -> None:
         equipmentManageBp,
         maintenanceBp,
         reportBp,
+        issueBp,
     ]
 
     for bp in blueprints:
