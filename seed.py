@@ -26,19 +26,19 @@ def seed_demo_data():
         db.session.add(u)
 
     resources = [
-        Resource(name="Meeting Room B-214", type="meeting room", capacity=24,
+        Resource(name="Meeting Room B-214", type="Meeting Room", capacity=24,
                  location="Faculty Building", status="available",
                  description="Whiteboard, video conference camera, HDMI display.",
                  isSpecialised=False),
-        Resource(name="Computer Lab A-203", type="computer lab", capacity=40,
+        Resource(name="Computer Lab A-203", type="Computer Lab", capacity=40,
                  location="FCI Block", status="available",
                  description="40 PCs, projector, instructor station, wired network.",
                  isSpecialised=False),
-        Resource(name="Projector P-04", type="projector", capacity=1,
+        Resource(name="Projector P-04", type="Projector", capacity=1,
                  location="AV Store", status="available",
                  description="High-lumen projector. Admin approval required.",
                  isSpecialised=True),
-        Resource(name="Seminar Room C-101", type="meeting room", capacity=60,
+        Resource(name="Seminar Room C-101", type="Meeting Room", capacity=60,
                  location="Main Block", status="available",
                  description="Tiered seating, dual displays.", isSpecialised=False),
     ]

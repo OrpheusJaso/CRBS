@@ -14,26 +14,47 @@
 
   // Build the resource dropdown from the student's bookings (dedup by resource).
   async function loadResources() {
-    var sel = byId("iss_resource");
-    try {
-      var data = await api.get("/api/booking");
-      var seen = {};
-      var opts = [];
-      data.bookings.forEach(function (b) {
-        if (!b.resourceId || seen[b.resourceId]) return;
-        seen[b.resourceId] = true;
-        opts.push('<option value="' + b.resourceId + '" data-booking="' + b.bookingId + '">' +
-          (b.resourceName || ("Resource " + b.resourceId)) + '</option>');
+  var sel = byId("iss_resource");
+  if (!sel) return; // widget not present on this page
+
+  try {
+    var data = await api.get("/api/booking");
+    var bookings = (data && Array.isArray(data.bookings)) ? data.bookings : [];
+
+    var seen = {};
+    var rows = [];
+    bookings.forEach(function (b) {
+      if (!b.resourceId || seen[b.resourceId]) return;
+      seen[b.resourceId] = true;
+      rows.push({
+        resourceId: b.resourceId,
+        bookingId: b.bookingId,
+        label: b.resourceName || ("Resource " + b.resourceId)
       });
-      if (!opts.length) {
-        sel.innerHTML = '<option value="">No booked resources to report</option>';
-      } else {
-        sel.innerHTML = '<option value="">Select a resource…</option>' + opts.join("");
-      }
-    } catch (e) {
-      sel.innerHTML = '<option value="">Could not load resources</option>';
-    }
+    });
+
+    sel.innerHTML = ""; // clear safely, no innerHTML string-building below
+
+    var placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = rows.length ? "Select a resource…" : "No booked resources to report";
+    sel.appendChild(placeholder);
+
+    rows.forEach(function (r) {
+      var opt = document.createElement("option");
+      opt.value = r.resourceId;
+      opt.dataset.booking = r.bookingId;
+      opt.textContent = r.label; // textContent escapes automatically — no XSS vector
+      sel.appendChild(opt);
+    });
+  } catch (e) {
+    sel.innerHTML = "";
+    var errOpt = document.createElement("option");
+    errOpt.value = "";
+    errOpt.textContent = "Could not load resources";
+    sel.appendChild(errOpt);
   }
+}
 
   async function loadReports() {
     var box = byId("iss_list");
