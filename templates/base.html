@@ -73,7 +73,9 @@
             {'url': url_for('views.search'), 'page': 'search', 'roles': ['student', 'staff'], 'icon': 'search', 'label': 'Search & Book'},
             {'url': url_for('views.bookings'), 'page': 'bookings', 'roles': ['student', 'staff'], 'icon': 'calendar-days', 'label': 'Manage Bookings'},
             {'url': url_for('views.report_issue'), 'page': 'report_issue', 'roles': ['student', 'staff'], 'icon': 'flag', 'label': 'Report Issue'},
-            {'url': url_for('views.resource'), 'page': 'resource', 'roles': ['manager', 'admin'], 'icon': 'wrench', 'label': 'Manage Resource'},
+            {'url': url_for('views.view_reports'), 'page': 'view_reports', 'roles': ['manager', 'admin'], 'icon': 'flag', 'label': 'View Reports'},
+            {'url': url_for('views.resource'), 'page': 'resource', 'roles': ['manager', 'admin'], 'icon': 'database', 'label': 'Manage Resource'},
+            {'url': url_for('views.maintenance'), 'page': 'maintenance', 'roles': ['manager', 'admin'], 'icon': 'wrench', 'label': 'Resource Maintenance'},
             {'url': url_for('views.equipment'), 'page': 'equipment', 'roles': ['staff', 'manager', 'admin'], 'icon': 'projector', 'label': 'Specialized Equipment'},
             {'url': url_for('views.approvals'), 'page': 'approvals', 'roles': ['manager', 'admin'], 'icon': 'clipboard-check', 'label': 'Approvals'},
             {'url': url_for('views.profile'), 'page': 'profile', 'roles': ['student', 'staff', 'manager', 'admin'], 'icon': 'settings', 'label': 'Profile Settings'}
@@ -118,7 +120,8 @@
         approvals: "{{ url_for('views.approvals') }}",
         profile: "{{ url_for('views.profile') }}",
         resource: "{{ url_for('views.resource') }}",
-        equipmentManagement: "{{ url_for('views.equipment_manage') }}"
+        equipmentManagement: "{{ url_for('views.equipment_manage') }}",
+        maintenance: "{{ url_for('views.maintenance') }}"
       }
     };
   </script>

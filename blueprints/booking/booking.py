@@ -31,7 +31,7 @@ def _payload():
 @login_required
 def list_bookings():
     """Return the signed-in user's bookings (the Manage Bookings table)."""
-    sweep_no_shows()  # US05 E3: lazily auto-cancel missed check-ins on view.
+    # sweep_no_shows()  # US05 E3: lazily auto-cancel missed check-ins on view.
     rows = (
         Booking.query.filter_by(userId=current_user_id())
         .order_by(Booking.startTime.desc())

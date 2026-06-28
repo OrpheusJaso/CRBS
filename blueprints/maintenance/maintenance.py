@@ -1,71 +1,105 @@
-from extensions import *
-from models import User
+from extensions import (
+    Blueprint, request, jsonify, abort, db, login_required, role_required,
+    current_user_id,
+)
+from models import Maintenance, Resource, MaintenanceLog
+from blueprints.maintenance.services import has_conflict, notify_all, edit_resource_status
+from datetime import datetime
 
 maintenanceBp = Blueprint("maintenance", __name__, url_prefix="/api/maintenance")
 
-class Maintenance(db.Model):
-    maintenanceId = db.Column("maintenanceId", db.Integer(11), primary_key = True, nullable = False)
-    resourceId = db.Column("resourceId", db.Integer(11), foreign_key = True, nullable = False)
-    scheduleDate = db.Column("scheduledDate", db.DateTime, nullable = False)
-    completedDate = db.Column("completedDate", db.DateTime, nullable = False)
-    status = db.Column("status", db.String(50), nullable = True)
-    description = db.Column("description", db.String(255), nullable = True)
-    duration = db.Column("duration", db.Integer(11), nullable = False)
-    
-    def __init__(self, maintenanceId, scheduledDate, completedDate, status, description, duration):
-        self.__maintenanceId = maintenanceId
-        self.__scheduledDate = scheduledDate
-        self.__completedDate = completedDate
-        self.__status = status
-        self.__description = description
-        self.__duration = duration
-        
-# Getters
-    def getMaintenanceId(self):
-        return self.__maintenanceId
-    
-    def getMaintenanceScheduledDate(self):
-        return self.__scheduledDate
-    
-    def getMaintenanceCompletedDate(self):
-        return self.__completedDate
-    
-    def getMaintenanceStatus(self):
-        return self.__status
-    
-    def getMaintenanceDescription(self):
-        return self.__description
-    
-    def getMaintenanceDuration(self):
-        return self.__duration
+# Specialised equipment requests come from staff (and admins acting as staff).
+MODIFIERS = ("manager", "admin")
 
-# Setters        
-    def setMaintenanceId(self, maintenanceId):
-        self.__maintenanceId = maintenanceId
-    
-    def setMaintenanceScheduledDate(self, scheduledDate):
-        self.__scheduledDate = scheduledDate
-    
-    def setMaintenanceCompletedDate(self, completedDate):
-        self.__completedDate = completedDate
-    
-    def setMaintenanceStatus(self, status):
-        self.__status = status
-    
-    def setMaintenanceDescription(self, description):
-        self.__description = description
-    
-    def setMaintenanceDuration(self, duration):
-        self.__duration = duration
+@maintenanceBp.get("")
+@login_required
+def list_maintenance():
+    """Catalogue of maintenances."""
+    return jsonify(maintenance=[m.to_dict() for m in Maintenance.query.all()])
+
+@maintenanceBp.get("/active")
+@login_required
+def list_active_maintenance():
+    """Resources currently under maintenance (drop-down option for maintenance completion form)."""
+    records = (
+        Maintenance.query
+        .filter(Maintenance.status.in_(["scheduled"]))
+        .all()
+    )
+    return jsonify(maintenance=[m.to_dict() for m in records])
+
+@maintenanceBp.get("/resources")
+@login_required
+def list_resource():
+    """Catalogue of resource (drop-down options for the maintenance form)."""
+    return jsonify(resource=[r.to_dict() for r in Resource.query.all()])
 
 @maintenanceBp.post("/create")
-def create():
+@role_required(*MODIFIERS)
+def create_maintenance():
+    """Submit a resource to be under maintenance (Resource Maintenance form)."""
     
-    # placeholder implementation (simple JSON-compatible return)
-    return {"model": "User"}
+    data = request.get_json(silent=True) or {}
+    name = (data.get("resourceName") or "").strip()
+    if not name:
+        abort(400, description="'resourceName' is required.")
+        
+    resource = Resource.query.filter_by(name=name).first()
+    
+    duration = (data.get("duration") or "")
+    
+    completion_date = None
+    if data.get("completionDate"):
+        try:
+            completion_date = datetime.fromisoformat(data["completionDate"])
+        except ValueError:
+            abort(400, description="Invalid 'completionDate'.")
 
-@maintenanceBp.post("/complete")
-def complete():
+    if has_conflict(resource.resourceId, datetime.now(), completion_date):
+        abort(409, description=f"'{name}' already has an overlapping maintenance window.")
+
+    maintenance = Maintenance(
+        resourceId = resource.resourceId,
+        description = data.get("description"),
+        scheduledDate = datetime.now(),
+        completedDate = completion_date,
+        duration = duration,
+        status = "scheduled",
+    )
+    db.session.add(maintenance)
+    db.session.commit()
     
-    # placeholder implementation (simple JSON-compatible return)
-    return {"model": "User"}
+    edit_resource_status(resource.resourceId, "maintenance")
+    
+    notify_all(
+    "Resource under maintenance",
+    f"{name} is now under maintenance and unavailable for booking.",
+    type="maintenance",
+    )
+    
+    return jsonify(maintenance=maintenance.to_dict()), 201
+
+@maintenanceBp.post("/<int:maintenance_id>/complete")
+@role_required(*MODIFIERS)
+def complete_maintenance(maintenance_id):
+    """Complete a Resource Maintenance (Complete Maintenance form)."""
+    
+    m = Maintenance.query.filter_by(maintenanceId=maintenance_id).first()
+    if not m:
+        abort(404, description="Maintenance record not found.")
+    
+    m.status = "completed"
+    m.completedDate = datetime.now()
+    
+    try:
+        edit_resource_status(m.resourceId, "available")
+    except ValueError as e:
+        abort(400, description=str(e))
+    
+    notify_all(
+    "Resource completed maintenance",
+    f"{m.resource.name if m.resource else 'A resource'} has completed maintenance and available for booking.",
+    type="maintenance",
+    )
+    
+    return jsonify(maintenance=m.to_dict()), 201

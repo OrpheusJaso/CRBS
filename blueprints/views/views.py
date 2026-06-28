@@ -79,11 +79,19 @@ def equipment_manage():
 def profile():
     return render_template("profile.html")
 
+@viewsBp.get("/maintenance")
+def maintenance():
+    return render_template("maintenance.html")
+
 @viewsBp.get("/report-issue")
 @page_roles("student", "staff")
 def report_issue():
     return render_template("report_issue.html")
 
+@viewsBp.get("/view-reports")
+@page_roles("manager", "admin")
+def view_reports():
+    return render_template("view_reports.html")
 
 @viewsBp.get("/uploads/<path:filename>")
 def uploaded_file(filename):

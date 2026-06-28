@@ -135,14 +135,17 @@ class Maintenance(db.Model):
     resourceId = db.Column(db.Integer, db.ForeignKey("resource.resourceId"), nullable=False)
     scheduledDate = db.Column(db.DateTime, nullable=False)
     completedDate = db.Column(db.DateTime, nullable=True)
+    # scheduled | completed
     status = db.Column(db.String(50), nullable=True, default="scheduled")
     description = db.Column(db.String(255), nullable=True)
     duration = db.Column(db.Integer, nullable=True)
+    resource = db.relationship("Resource", backref="maintenance_records", lazy=True)
 
     def to_dict(self):
         return {
             "maintenanceId": self.maintenanceId,
             "resourceId": self.resourceId,
+            "resourceName": self.resource.name if self.resource else None,
             "scheduledDate": self.scheduledDate.isoformat() if self.scheduledDate else None,
             "completedDate": self.completedDate.isoformat() if self.completedDate else None,
             "status": self.status,
@@ -203,7 +206,33 @@ class EquipmentRequest(db.Model):
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
+        
+        
+class MaintenanceLog(db.Model):
+    """A log of a created Maintenance (Maintenance Creation form)."""
+    __tablename__ = "maintenance_log"
 
+    maintenanceRequestId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    userId = db.Column(db.String(50), db.ForeignKey("user.userId"), nullable=False)
+    resourceName = db.Column(db.String(100), nullable=False)
+    reason = db.Column(db.String(500), nullable=True)
+    endDate = db.Column(db.DateTime, nullable=True)
+    # scheduled | completed
+    status = db.Column(db.String(20), nullable=False, default="ongoing")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship("User", backref="maintenance_log", lazy=True)
+
+    def to_dict(self):
+        return {
+            "requestId": self.maintenanceRequestId,
+            "userId": self.userId,
+            "resourceName": self.resourceName,
+            "reason": self.reason,
+            "endDate": self.endDate.isoformat() if self.endDate else None,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
 
 class IssueReport(db.Model):
     """A student/staff fault report about a campus resource (US07)."""
