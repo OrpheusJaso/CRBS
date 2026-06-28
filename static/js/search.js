@@ -48,6 +48,7 @@
   async function runSearch() {
     var params = new URLSearchParams();
     if (byId("srch_type").value) params.set("type", byId("srch_type").value);
+    if (byId("srch_location").value) params.set("location", byId("srch_location").value);
     if (byId("srch_capacity").value) params.set("capacity", byId("srch_capacity").value);
     if (byId("srch_date").value) {
       params.set("date", byId("srch_date").value);
@@ -67,6 +68,10 @@
     byId("bk_start").value = localValue(start);
     byId("bk_end").value = localValue(end);
     byId("bk_capacity").value = Math.min(r.capacity || 10, 10);
+    // Specialised resources need a supporting document (US04 A1).
+    var docWrap = byId("bk_docWrap");
+    docWrap.classList.toggle("hidden", !r.isSpecialised);
+    byId("bk_document").value = "";
     openModal("bookingModal");
   }
 
@@ -98,13 +103,27 @@
   byId("bookingForm").addEventListener("submit", async function (e) {
     e.preventDefault();
     try {
-      var res = await api.post("/api/booking", {
-        resourceId: current.resourceId,
-        purpose: byId("bk_purpose").value,
-        startTime: byId("bk_start").value,
-        endTime: byId("bk_end").value,
-        capacity: parseInt(byId("bk_capacity").value) || null
-      });
+      var res;
+      if (current.isSpecialised) {
+        var file = byId("bk_document").files[0];
+        if (!file) { showToast("Document required", "Attach a supporting document for this resource."); return; }
+        var fd = new FormData();
+        fd.append("resourceId", current.resourceId);
+        fd.append("purpose", byId("bk_purpose").value);
+        fd.append("startTime", byId("bk_start").value);
+        fd.append("endTime", byId("bk_end").value);
+        fd.append("capacity", parseInt(byId("bk_capacity").value) || "");
+        fd.append("document", file);
+        res = await api.postForm("/api/booking", fd);
+      } else {
+        res = await api.post("/api/booking", {
+          resourceId: current.resourceId,
+          purpose: byId("bk_purpose").value,
+          startTime: byId("bk_start").value,
+          endTime: byId("bk_end").value,
+          capacity: parseInt(byId("bk_capacity").value) || null
+        });
+      }
       closeModal("bookingModal");
       showToast(res.booking.status === "pending" ? "Approval requested" : "Booking confirmed",
                 current.name + (res.booking.status === "pending" ? " awaits manager approval." : " is reserved."));
@@ -115,16 +134,19 @@
   byId("recurringForm").addEventListener("submit", async function (e) {
     e.preventDefault();
     try {
-      var res = await api.post("/api/booking/recurring", {
-        resourceId: current.resourceId,
-        purpose: byId("rc_purpose").value,
-        recurrence: byId("rc_pattern").value,
-        startTime: byId("rc_start").value,
-        endTime: byId("rc_end").value,
-        until: byId("rc_until").value
-      });
+      var file = byId("rc_document").files[0];
+      if (!file) { showToast("Document required", "Attach a supporting document for recurring bookings."); return; }
+      var fd = new FormData();
+      fd.append("resourceId", current.resourceId);
+      fd.append("purpose", byId("rc_purpose").value);
+      fd.append("recurrence", byId("rc_pattern").value);
+      fd.append("startTime", byId("rc_start").value);
+      fd.append("endTime", byId("rc_end").value);
+      fd.append("until", byId("rc_until").value);
+      fd.append("document", file);
+      var res = await api.postForm("/api/booking/recurring", fd);
       closeModal("recurringModal");
-      showToast("Recurring booking created", res.count + " sessions booked for " + current.name + ".");
+      showToast("Approval requested", res.count + " sessions for " + current.name + " await manager approval.");
       runSearch();
     } catch (err) { showToast("Could not create series", err.message); }
   });

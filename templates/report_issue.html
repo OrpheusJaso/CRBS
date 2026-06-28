@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Report Issue{% endblock %}
+{% block active_page %}report_issue{% endblock %}
+
+{% block content %}
+<section id="reportIssue">
+  <div class="mb-5">
+    <h2 class="text-2xl font-semibold">Report an Issue</h2>
+    <p class="text-sm text-slate-600">Flag a faulty or damaged resource from your booking history. The resource manager is notified to arrange maintenance.</p>
+  </div>
+
+  <div class="grid gap-5 xl:grid-cols-[0.85fr_1fr]">
+    <form id="issueForm" class="rounded-md border border-slate-200 bg-white p-4">
+      <div class="grid gap-4">
+        <label class="block text-sm font-medium">Resource (from your bookings)
+          <select id="iss_resource" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option value="">Loading…</option>
+          </select>
+        </label>
+        <label class="block text-sm font-medium">Issue details
+          <textarea id="iss_description" required placeholder="e.g. Projector bulb not working, broken chair, damaged whiteboard…" class="mt-1 min-h-28 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </label>
+        <label class="block text-sm font-medium">Photo of the issue (optional)
+          <input type="file" id="iss_image" accept=".png,.jpg,.jpeg,.gif,.webp" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+      </div>
+      <button type="submit" class="mt-5 flex items-center gap-2 rounded-md bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white">
+        <i data-lucide="flag" class="h-4 w-4"></i> Submit Report
+      </button>
+    </form>
+
+    <div class="rounded-md border border-slate-200 bg-white p-4">
+      <h3 class="mb-3 font-semibold">Your Reported Issues</h3>
+      <div id="iss_list" class="space-y-2 text-sm">
+        <p class="text-slate-500">Loading…</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_script %}
+<script src="{{ url_for('static', filename='js/report_issue.js') }}"></script>
+{% endblock %}

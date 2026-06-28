@@ -85,6 +85,8 @@ class Booking(TimestampMixin, db.Model):
     isRecurring = db.Column(db.Boolean, nullable=False, default=False)
     recurrence = db.Column(db.String(20), nullable=True)   # weekly / monthly
     checkedInAt = db.Column(db.DateTime, nullable=True)
+    # Supporting document uploaded for specialised/recurring approval (US04 A1).
+    documentPath = db.Column(db.String(255), nullable=True)
 
     def to_dict(self):
         return {
@@ -99,6 +101,7 @@ class Booking(TimestampMixin, db.Model):
             "isRecurring": self.isRecurring,
             "recurrence": self.recurrence,
             "checkedInAt": self.checkedInAt.isoformat() if self.checkedInAt else None,
+            "documentUrl": f"/uploads/{self.documentPath}" if self.documentPath else None,
         }
 
 
@@ -197,6 +200,38 @@ class EquipmentRequest(db.Model):
             "purpose": self.purpose,
             "requestedDate": self.requestedDate.isoformat() if self.requestedDate else None,
             "attendees": self.attendees,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
+
+
+class IssueReport(db.Model):
+    """A student/staff fault report about a campus resource (US07)."""
+    __tablename__ = "issue_report"
+
+    reportId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    userId = db.Column(db.String(50), db.ForeignKey("user.userId"), nullable=False)
+    resourceId = db.Column(db.Integer, db.ForeignKey("resource.resourceId"), nullable=False)
+    bookingId = db.Column(db.Integer, db.ForeignKey("booking.bookingId"), nullable=True)
+    description = db.Column(db.String(1000), nullable=False)
+    imagePath = db.Column(db.String(255), nullable=True)
+    # open | in_progress | resolved
+    status = db.Column(db.String(20), nullable=False, default="open")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship("User", backref="issue_reports", lazy=True)
+    resource = db.relationship("Resource", backref="issue_reports", lazy=True)
+
+    def to_dict(self):
+        return {
+            "reportId": self.reportId,
+            "userId": self.userId,
+            "reporterName": self.user.name if self.user else None,
+            "resourceId": self.resourceId,
+            "resourceName": self.resource.name if self.resource else None,
+            "bookingId": self.bookingId,
+            "description": self.description,
+            "imageUrl": f"/uploads/{self.imagePath}" if self.imagePath else None,
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }

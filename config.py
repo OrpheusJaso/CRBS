@@ -31,3 +31,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # The JSON API is session/origin protected; CSRF form tokens are not used.
     WTF_CSRF_ENABLED = False
+
+    # Uploaded booking documents (US04) and issue images (US07) land here.
+    UPLOAD_FOLDER = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)), "uploads"
+    )
+    MAX_CONTENT_LENGTH = 8 * 1024 * 1024  # 8 MB cap per upload
