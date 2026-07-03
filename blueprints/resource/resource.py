@@ -2,8 +2,8 @@ from extensions import (
     Blueprint, request, jsonify, abort, db, login_required, role_required, render_template
 )
 from models import Resource, Booking
-from datetime import datetime
-from blueprints.booking.services import parse_dt, has_conflict
+from datetime import datetime, timedelta
+from blueprints.booking.services import parse_dt, has_conflict, ACTIVE_STATUSES
 from .services import is_duplicate, validate_resource_data
 
 resourceBp = Blueprint("resource", __name__, url_prefix="/api/resource")
@@ -57,6 +57,16 @@ def search():
         except ValueError:
             abort(400, description="Invalid date/time in search.")
 
+    # Day shown in the calendar view: the searched date, else today.
+    try:
+        cal_date = datetime.fromisoformat(date).date() if date else None
+    except ValueError:
+        cal_date = None
+    if cal_date is None:
+        cal_date = datetime.utcnow().date()
+    day_start = datetime.combine(cal_date, datetime.min.time())
+    day_end = day_start + timedelta(days=1)
+
     results = []
     for r in candidates:
         item = r.to_dict()
@@ -68,9 +78,27 @@ def search():
             item["available"] = available
         else:
             item["available"] = r.status == "available"
+
+        # Active bookings that touch the calendar day, so the calendar view can
+        # draw busy vs. free slots per resource.
+        day_bookings = Booking.query.filter(
+            Booking.resourceId == r.resourceId,
+            Booking.status.in_(ACTIVE_STATUSES),
+            Booking.startTime < day_end,
+            Booking.endTime > day_start,
+        ).all()
+        item["bookings"] = [
+            {
+                "startTime": b.startTime.isoformat(),
+                "endTime": b.endTime.isoformat(),
+                "status": b.status,
+            }
+            for b in day_bookings
+        ]
         results.append(item)
 
-    return jsonify(count=len(results), resources=results)
+    return jsonify(count=len(results), resources=results,
+                   calendarDate=cal_date.isoformat())
 
 @resourceBp.post("")
 @role_required(*MODIFIERS)

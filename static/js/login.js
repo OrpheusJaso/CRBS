@@ -23,12 +23,35 @@
     refreshIcons();
   }
 
+  // Toggle the red "required field" highlight on the bordered element.
+  // For email that's the input itself; for password it's the wrapping div
+  // that actually carries the border.
+  function setError(el, hasError) {
+    el.classList.toggle("border-red-500", hasError);
+    el.classList.toggle("border-slate-300", !hasError);
+  }
+
   async function signIn() {
+    // E2: reject the login and highlight required fields when email or
+    // password is not entered, before ever calling the API.
+    var emailEl = byId("email");
+    var passwordEl = byId("password");
+    var email = emailEl.value.trim();
+    var password = passwordEl.value;
+
+    var emailMissing = !email;
+    var passwordMissing = !password;
+    setError(emailEl, emailMissing);
+    setError(passwordEl.parentElement, passwordMissing);
+
+    if (emailMissing || passwordMissing) {
+      showToast("Missing information", "Please enter your email and password.");
+      (emailMissing ? emailEl : passwordEl).focus();
+      return;
+    }
+
     try {
-      var data = await api.post("/api/user/login", {
-        email: byId("email").value.trim(),
-        password: byId("password").value
-      });
+      var data = await api.post("/api/user/login", { email: email, password: password });
       localStorage.setItem("crbsRole", data.user.role);   // cache for nav
       window.location.href = window.CRBS.urls.dashboard;
     } catch (err) {
@@ -72,5 +95,14 @@
     }
   });
 
-  document.addEventListener("DOMContentLoaded", refreshIcons);
+  document.addEventListener("DOMContentLoaded", function () {
+    refreshIcons();
+    // Clear the required-field highlight once the user starts fixing it.
+    byId("email").addEventListener("input", function () {
+      setError(byId("email"), false);
+    });
+    byId("password").addEventListener("input", function () {
+      setError(byId("password").parentElement, false);
+    });
+  });
 })();

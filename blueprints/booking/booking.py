@@ -56,6 +56,8 @@ def create_booking():
         abort(400, description=str(e))
     if end <= start:
         abort(400, description="End time must be after start time.")
+    if start < datetime.now():
+        abort(400, description="Cannot create a booking that starts in the past.")
 
     if data.get("capacity") and int(data["capacity"]) > resource.capacity:
         abort(409, description="Requested capacity exceeds resource capacity.")
@@ -113,6 +115,8 @@ def create_recurring():
         abort(400, description=str(e))
     if end <= start:
         abort(400, description="End time must be after start time.")
+    if start < datetime.now():
+        abort(400, description="Cannot create a booking that starts in the past.")
 
     # US04 A1/E1: recurring bookings always require a supporting document.
     upload = files.get("document") if files else None
@@ -169,6 +173,8 @@ def modify_booking(booking_id):
         abort(400, description=str(e))
     if end <= start:
         abort(400, description="End time must be after start time.")
+    if start < datetime.now():
+        abort(400, description="Cannot move a booking to a time in the past.")
     if has_conflict(booking.resourceId, start, end, exclude_booking_id=booking.bookingId):
         abort(409, description="That new time slot conflicts with another booking.")
 
@@ -211,7 +217,7 @@ def check_in(booking_id):
     if booking.status == "checked_in":
         abort(409, description="You have already checked in for this booking.")
 
-    now = datetime.utcnow()
+    now = datetime.now()  # booking times are stored as local wall-clock
     if now < booking.startTime - timedelta(minutes=CHECKIN_EARLY_MINUTES):
         abort(403, description="Please wait until the check-in time.")
     if now > booking.endTime:

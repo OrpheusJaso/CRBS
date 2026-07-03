@@ -57,7 +57,16 @@
     var body = { name: byId("pf_name").value, email: byId("pf_email").value };
     if (pw) { body.password = pw; body.currentPassword = byId("pf_current").value; }
     try {
-      await api.put("/api/profile", body);
+      var res = await api.put("/api/profile", body);
+      // Reflect the saved values immediately so no page refresh is needed:
+      // update the form fields, the header name, and the cached name.
+      if (res && res.user) {
+        byId("pf_name").value = res.user.name;
+        byId("pf_email").value = res.user.email;
+        localStorage.setItem("crbsName", res.user.name || "");
+        var hdr = byId("headerUserName");
+        if (hdr) hdr.textContent = res.user.name || "";
+      }
       byId("pf_current").value = "";
       byId("pf_password").value = "";
       byId("pf_password2").value = "";

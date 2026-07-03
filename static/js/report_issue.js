@@ -45,7 +45,7 @@
       }
       box.innerHTML = data.reports.map(function (r) {
         var t = statusTone[r.status] || "bg-slate-100 text-slate-700";
-        var img = r.imageUrl ? '<a href="' + r.imageUrl + '" target="_blank" class="text-xs font-semibold text-sky-700">View photo</a>' : "";
+        var img = r.imageUrl ? '<button type="button" data-photo="' + r.imageUrl + '" class="text-xs font-semibold text-sky-700 hover:text-sky-900">View photo</button>' : "";
         return '<div class="rounded-md border border-slate-200 p-3">' +
           '<div class="mb-1 flex items-center justify-between gap-2">' +
           '<p class="font-medium">' + (r.resourceName || "Resource") + '</p>' +
@@ -79,6 +79,27 @@
       showToast("Issue reported", "The resource manager has been notified.");
       loadReports();
     } catch (err) { showToast("Could not submit", err.message); }
+  });
+
+  // Open the photo lightbox (delegated: the list is re-rendered on each load).
+  byId("iss_list").addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-photo]");
+    if (!btn) return;
+    var url = btn.getAttribute("data-photo");
+    byId("photoModalImg").src = url;
+    byId("photoModalOpen").href = url;
+    openModal("photoModal");
+  });
+
+  // Close via the Back / X buttons, the backdrop, or the Escape key.
+  var photoModal = byId("photoModal");
+  photoModal.addEventListener("click", function (e) {
+    if (e.target === photoModal || e.target.closest("[data-photo-close]")) {
+      closeModal("photoModal");
+    }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && photoModal.classList.contains("active")) closeModal("photoModal");
   });
 
   document.addEventListener("DOMContentLoaded", function () { loadResources(); loadReports(); });

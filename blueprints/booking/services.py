@@ -48,8 +48,14 @@ def has_conflict(resource_id, start, end, exclude_booking_id=None):
 
 
 def within_lock_window(start):
-    """True if `start` is less than MODIFY_LOCK_HOURS away (policy lock)."""
-    return start - datetime.utcnow() < timedelta(hours=MODIFY_LOCK_HOURS)
+    """True if `start` is less than MODIFY_LOCK_HOURS away (policy lock).
+
+    Compares against local wall-clock time (datetime.now()) because booking
+    start/end times are stored as the naive local times submitted from the
+    browser. Using datetime.utcnow() here offsets the check by the server's UTC
+    offset and lets bookings be cancelled/modified inside the 24-hour window.
+    """
+    return start - datetime.now() < timedelta(hours=MODIFY_LOCK_HOURS)
 
 
 def recurrence_dates(start, end, pattern, until):
@@ -70,7 +76,7 @@ def sweep_no_shows():
     `pending`, `cancelled` and already-`no_show` rows are left alone. Returns the
     number of bookings flipped so callers can react if needed.
     """
-    now = datetime.utcnow()
+    now = datetime.now()  # booking times are stored as local wall-clock
     stale = Booking.query.filter(
         Booking.status == "confirmed",
         Booking.endTime < now,
